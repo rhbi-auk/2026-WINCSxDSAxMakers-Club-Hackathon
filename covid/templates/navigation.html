@@ -11,18 +11,10 @@
   <a class="btn-nav" href="{{ url_for('authentication_bp.logout') }}">Logout</a>
 
   <div>
-    <h3>
-      <a class="btn-nav" href="{{ url_for('news_bp.articles_by_date') }}">
-        Browse timeline
-      </a>
-    </h3>
-  </div>
-
-  <div>
     <h3 id="sub-nav-header">Browse by tag</h3>
-    {% for key in tag_urls %}
-      <a class="btn-nav" href="{{ tag_urls[key] }}">{{ key }}</a>
-    {% endfor %}
+    <a class="btn-nav" href="{{ url_for('news_bp.articles_by_tag', tag='Upcoming visits') }}#upcoming">Upcoming visits</a>
+    <a class="btn-nav" href="{{ url_for('news_bp.articles_by_tag', tag='Follow-up care') }}#follow-up">Follow-up care</a>
+    <a class="btn-nav" href="{{ url_for('news_bp.articles_by_tag', tag='Annual checkups') }}#checkups">Annual checkups</a>
   </div>
 
   <div id="nav-footer">

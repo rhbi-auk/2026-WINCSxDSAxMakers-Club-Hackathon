@@ -3,6 +3,25 @@
 {% block content %}
 
 <main id="main">
+    {% if not articles %}
+    <header id="article-header">
+        <h1>Appointment reminder guide</h1>
+        <p>A simple place to organize the reminders that support your care.</p>
+    </header>
+
+    <section id="upcoming">
+        <h2>Upcoming visits</h2>
+        <p>Keep the date, time, clinic, and preparation notes together before each visit.</p>
+    </section>
+    <section id="follow-up">
+        <h2>Follow-up care</h2>
+        <p>Note any follow-up appointment or next step your care team asks you to schedule.</p>
+    </section>
+    <section id="checkups">
+        <h2>Annual checkups</h2>
+        <p>Keep a reminder for routine yearly visits and preventive screenings.</p>
+    </section>
+    {% else %}
     <header id="article-header">
         <h1>{{ articles_title }}</h1>
     </header>
@@ -90,5 +109,6 @@
             </div>
         </nav>
     </footer>
+    {% endif %}
 </main>
 {% endblock %}
