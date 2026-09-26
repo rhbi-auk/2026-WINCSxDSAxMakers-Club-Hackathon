@@ -1,0 +1,302 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<!-- English calendar -->
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+>
+
+<style>
+    /* Doctor visit prep page */
+    .booking-page {
+        min-height: 85vh;
+        padding: 50px 20px;
+        background: linear-gradient(
+            135deg,
+            #f8f5ff,
+            #ece4ff
+        );
+        font-family: Arial, sans-serif;
+        box-sizing: border-box;
+    }
+
+    /* White form card */
+    .booking-card {
+        width: 100%;
+        max-width: 650px;
+        margin: 0 auto;
+        padding: 36px;
+        border-radius: 22px;
+        background: white;
+        box-shadow: 0 12px 40px
+            rgba(104, 73, 155, 0.13);
+        box-sizing: border-box;
+    }
+
+    /* Title */
+    .booking-card h1 {
+        color: #7952b3;
+        text-align: center;
+        font-size: 30px;
+        margin-bottom: 5px;
+    }
+
+    .booking-card p {
+        color: #777;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    /* Form labels */
+    .booking-card label {
+        display: block;
+        margin: 18px 0 7px;
+        font-weight: bold;
+        color: #40364f;
+    }
+
+    /* Form fields */
+    .booking-card input,
+    .booking-card select,
+    .booking-card textarea {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 13px;
+        border: 1px solid #d8caef;
+        border-radius: 10px;
+        background: #fff;
+        font: inherit;
+    }
+
+    .booking-card input:focus,
+    .booking-card select:focus,
+    .booking-card textarea:focus {
+        outline: none;
+        border-color: #8059c8;
+        box-shadow: 0 0 0 3px
+            rgba(128, 89, 200, 0.12);
+    }
+
+    .booking-card textarea {
+        resize: vertical;
+        min-height: 110px;
+    }
+
+    /* Save button */
+    .booking-card button {
+        width: 100%;
+        margin-top: 24px;
+        padding: 14px;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        background: #8059c8;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .booking-card button:hover {
+        background: #6944b0;
+    }
+
+    /* Expand content and remove right green sidebar */
+    #container:has(.booking-page) {
+        display: block;
+        width: 100%;
+    }
+
+    #container:has(.booking-page) .booking-page {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    #sidebar {
+        display: none !important;
+    }
+
+    /* Purple English calendar */
+    .flatpickr-calendar {
+        font-family: Arial, sans-serif;
+        border-radius: 14px;
+        box-shadow: 0 12px 30px
+            rgba(104, 73, 155, 0.16);
+    }
+
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover {
+        background: #8059c8;
+        border-color: #8059c8;
+    }
+
+    @media (max-width: 600px) {
+        .booking-page {
+            padding: 24px 12px;
+        }
+
+        .booking-card {
+            padding: 25px 20px;
+        }
+    }
+</style>
+
+<main class="booking-page">
+    <div class="booking-card">
+
+        {% if success %}
+        <div style="
+            background: #e7f6eb;
+            color: #246c3b;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        ">
+            <strong>
+                Doctor visit prep saved successfully!
+            </strong>
+
+            <p>Your preparation notes have been saved.</p>
+
+            <small>
+                This is a visit preparation record,
+                not a medical diagnosis.
+            </small>
+        </div>
+        {% endif %}
+        {% if error %}
+        <div style="
+            background: #fff0f1;
+            color: #a13333;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        ">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <h1>Doctor Visit Prep</h1>
+
+        {% if appointment %}
+        <p>
+            Preparation notes for {{ appointment["doctor_name"] }}'s {{ appointment["appointment_type"] }} on {{ appointment["appointment_date"] }}.
+        </p>
+        {% else %}
+        <p>Prepare for your next doctor visit.</p>
+        {% endif %}
+
+        <form method="POST"{% if appointment %} action="{{ url_for('appointment_visit_prep', appointment_id=appointment['id']) }}"{% endif %}>
+
+            <!-- Main concern / Symptoms -->
+            <label for="main_concern">
+                Main concern / Symptoms
+            </label>
+
+            <textarea
+                id="main_concern"
+                name="main_concern"
+                rows="4"
+                placeholder="What symptoms or discomfort are you experiencing?"
+                required
+            >{{ prep_notes.main_concern if prep_notes else '' }}</textarea>
+
+            <!-- When did it start -->
+            <label for="start_date">
+                When did it start?
+            </label>
+
+            <input
+                type="text"
+                id="start_date"
+                name="start_date"
+                placeholder="MM/DD/YYYY"
+                autocomplete="off"
+                value="{{ prep_notes.start_date if prep_notes else '' }}"
+                required
+            >
+
+            <!-- Duration / Frequency -->
+            <label for="duration_frequency">
+                Duration / Frequency
+            </label>
+
+            <textarea
+                id="duration_frequency"
+                name="duration_frequency"
+                rows="4"
+                placeholder="How long have you had these symptoms, and how often do they occur?"
+            >{{ prep_notes.duration_frequency if prep_notes else '' }}</textarea>
+
+            <!-- Current medications -->
+            <label for="current_medications">
+                Current medications
+            </label>
+
+            <textarea
+                id="current_medications"
+                name="current_medications"
+                rows="4"
+                placeholder="What medications are you currently taking?"
+            >{{ prep_notes.current_medications if prep_notes else '' }}</textarea>
+
+            <!-- Allergies -->
+            <label for="allergies">
+                Allergies
+            </label>
+
+            <textarea
+                id="allergies"
+                name="allergies"
+                rows="4"
+                placeholder="Do you have any known allergies?"
+            >{{ prep_notes.allergies if prep_notes else '' }}</textarea>
+
+            <!-- Questions for your doctor -->
+            <label for="questions">
+                Questions for your doctor
+            </label>
+
+            <textarea
+                id="questions"
+                name="questions"
+                rows="4"
+                placeholder="What would you like to ask your doctor?"
+            >{{ prep_notes.questions if prep_notes else '' }}</textarea>
+
+            <!-- Submit -->
+            <button type="submit">
+                Save Visit Prep
+            </button>
+
+        </form>
+
+        <p style="
+            margin-top: 22px;
+            font-size: 12px;
+            color: #888;
+        ">
+            This is a visit preparation record,
+            not a confirmed medical booking.
+        </p>
+
+    </div>
+</main>
+
+<!-- Flatpickr JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    flatpickr("#start_date", {
+        locale: "en",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "m/d/Y",
+        maxDate: "today",
+        allowInput: false
+    });
+</script>
+
+{% endblock %}
