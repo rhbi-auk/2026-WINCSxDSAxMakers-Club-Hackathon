@@ -363,5 +363,13 @@ def create_app(test_config=None):
                 )
 
             return redirect(url_for("my_appointments"))
+        
+        # Health Timeline
+        @app.route("/health-timeline", methods=["GET"])
+        def health_timeline():
+            return render_template(
+                "timeline/health_timeline.html"
+            )
+
 
     return app
