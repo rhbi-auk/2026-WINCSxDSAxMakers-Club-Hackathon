@@ -30,27 +30,9 @@
       {% include 'navigation.html' %}
 
       <div id="content-2">
-        <!-- Include header partial. -->
-        {% include 'header.html' %}
-
         <div id="container">
           <!-- Main content block to be supplied by page. -->
           {% block content %} {% endblock %}
-
-          <!-- Include sidebar partial. -->
-          
-        
-{% if request.endpoint not in [
-    'book_appointment',
-    'my_appointments',
-    'authentication_bp.login',
-    'authentication_bp.register'
-] %}
-    {% include 'sidebar.html' %}
-{% endif %}
-
-
-
         </div>
         
       </div>
