@@ -45,7 +45,7 @@ img {
   border-bottom: 1px solid rgba(254, 206, 241, 0.24);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  color: #243342;
+  color: #99F6E4;
   display: block;
 }
 
@@ -117,7 +117,7 @@ img {
 #nav {
   width: 200px;
   height: 100%;
-  background: #99F6E4;
+  background: #0F766E;
   padding: 30px 0px;
   position: fixed;
 }
@@ -138,9 +138,10 @@ img {
 }
 
 #nav-footer {
-  color: #243342;
+  color: #ffffff;
   margin-top: 25px;
   margin-bottom: 20px;
+  margin-left: 10px;
   position: absolute;
   bottom: 0;
   font-size: small;
