@@ -1,0 +1,354 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<style>
+    /* 不显示原 COVID 网页右侧绿色 sidebar */
+    #sidebar {
+        display: none;
+    }
+
+    #container:has(.timeline-page) {
+        display: block;
+        width: 100%;
+    }
+
+    .timeline-page {
+        min-height: 85vh;
+        padding: 45px 24px;
+        background: #f8f5ff;
+        font-family: Arial, sans-serif;
+        box-sizing: border-box;
+    }
+
+    .timeline-container {
+        max-width: 850px;
+        margin: 0 auto;
+    }
+
+    /* 输入区域 */
+    .timeline-form-card {
+        background: white;
+        padding: 36px;
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(104, 73, 155, 0.12);
+        margin-bottom: 35px;
+    }
+
+    .timeline-form-card h1 {
+        margin: 0 0 8px;
+        text-align: center;
+        color: #64439b;
+        font-size: 32px;
+    }
+
+    .timeline-subtitle {
+        text-align: center;
+        color: #81778e;
+        margin-bottom: 30px;
+    }
+
+    .form-field {
+        margin-bottom: 20px;
+    }
+
+    .form-field label {
+        display: block;
+        margin-bottom: 8px;
+        color: #40364f;
+        font-weight: bold;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 13px 14px;
+        border: 1px solid #ddd4ef;
+        border-radius: 10px;
+        background: #fcfbff;
+        font-size: 15px;
+    }
+
+    .form-field textarea {
+        resize: vertical;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+        outline: none;
+        border-color: #8059c8;
+        box-shadow: 0 0 0 3px rgba(128, 89, 200, 0.12);
+    }
+
+    .add-button {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 10px;
+        background: #8059c8;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .add-button:hover {
+        background: #6944b0;
+    }
+
+    /* 历史记录 */
+    .history-title {
+        color: #64439b;
+        font-size: 26px;
+        margin-bottom: 20px;
+    }
+
+    .event-card {
+        background: white;
+        padding: 24px 28px;
+        margin-bottom: 18px;
+        border-radius: 16px;
+        border-left: 5px solid #8059c8;
+        box-shadow: 0 6px 22px rgba(104, 73, 155, 0.10);
+    }
+
+    .event-date {
+        color: #8059c8;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .event-type {
+        color: #40364f;
+        font-size: 21px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .severity {
+        display: inline-block;
+        padding: 5px 11px;
+        margin-bottom: 10px;
+        background: #eee6ff;
+        color: #64439b;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .event-description,
+    .event-notes {
+        color: #51485d;
+        line-height: 1.6;
+    }
+
+    .empty-state {
+        background: white;
+        padding: 32px;
+        text-align: center;
+        color: #81778e;
+        border-radius: 16px;
+    }
+</style>
+
+
+<main class="timeline-page">
+
+    <div class="timeline-container">
+
+        <div class="timeline-form-card">
+
+            <h1>Health Timeline</h1>
+
+            <p class="timeline-subtitle">
+                Record important changes in your health over time.
+            </p>
+
+            <form method="POST">
+
+                <div class="form-field">
+                    <label for="event_date">Date</label>
+
+                    <input
+                        type="date"
+                        id="event_date"
+                        name="event_date"
+                        required>
+                </div>
+
+
+                <div class="form-field">
+                    <label for="event_type">Event Type</label>
+
+                    <select
+                        id="event_type"
+                        name="event_type"
+                        required>
+
+                        <option value="">
+                            Select event type
+                        </option>
+
+                        <option value="Symptom">
+                            Symptom
+                        </option>
+
+                        <option value="Medication">
+                            Medication
+                        </option>
+
+                        <option value="Doctor Visit">
+                            Doctor Visit
+                        </option>
+
+                        <option value="Test">
+                            Test
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+                </div>
+
+
+                <div class="form-field">
+                    <label for="description">
+                        What happened?
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="4"
+                        placeholder="Describe what happened..."
+                        required></textarea>
+                </div>
+
+
+                <div class="form-field">
+                    <label for="severity">
+                        Severity
+                    </label>
+
+                    <select
+                        id="severity"
+                        name="severity">
+
+                        <option value="">
+                            Not applicable
+                        </option>
+
+                        <option value="Mild">
+                            Mild
+                        </option>
+
+                        <option value="Moderate">
+                            Moderate
+                        </option>
+
+                        <option value="Severe">
+                            Severe
+                        </option>
+
+                    </select>
+                </div>
+
+
+                <div class="form-field">
+                    <label for="notes">
+                        Notes
+                    </label>
+
+                    <textarea
+                        id="notes"
+                        name="notes"
+                        rows="3"
+                        placeholder="Additional details..."></textarea>
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="add-button">
+
+                    + Add to Timeline
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <h2 class="history-title">
+            My Health History
+        </h2>
+
+
+        {% if events %}
+
+            {% for event in events %}
+
+                <div class="event-card">
+
+                    <div class="event-date">
+                        {{ event["event_date"] }}
+                    </div>
+
+                    <div class="event-type">
+                        {{ event["event_type"] }}
+                    </div>
+
+
+                    {% if event["severity"] %}
+
+                        <div class="severity">
+                            {{ event["severity"] }}
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="event-description">
+                        {{ event["description"] }}
+                    </div>
+
+
+                    {% if event["notes"] %}
+
+                        <p class="event-notes">
+                            <strong>Notes:</strong>
+                            {{ event["notes"] }}
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <h3>No health events yet</h3>
+
+                <p>
+                    Add your first event to start building your health timeline.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</main>
+
+{% endblock %}

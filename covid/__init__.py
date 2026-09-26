@@ -78,7 +78,19 @@ def create_app(test_config=None):
                     status TEXT NOT NULL DEFAULT 'Pending'
                 )
             """)
+        # Create health timeline table
+        with sqlite3.connect(db_path) as conn:
 
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS health_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    event_date TEXT NOT NULL,
+                    event_type TEXT NOT NULL,
+                    description TEXT NOT NULL,
+                    severity TEXT,
+                    notes TEXT
+                )
+            """)
         # --------------------------------
         # Book appointment
         # --------------------------------
@@ -218,6 +230,75 @@ def create_app(test_config=None):
                 "appointment/my_appointments.html",
                 appointments=appointments
             )
+    # --------------------------------
+    # Health Timeline
+    # --------------------------------
 
+    @app.route(
+        "/health-timeline",
+        methods=["GET", "POST"]
+    )
+    def health_timeline():
+
+        if request.method == "POST":
+
+            event_date = request.form.get(
+                "event_date", ""
+            ).strip()
+
+            event_type = request.form.get(
+                "event_type", ""
+            ).strip()
+
+            description = request.form.get(
+                "description", ""
+            ).strip()
+
+            severity = request.form.get(
+                "severity", ""
+            ).strip()
+
+            notes = request.form.get(
+                "notes", ""
+            ).strip()
+
+            if event_date and event_type and description:
+
+                with sqlite3.connect(db_path) as conn:
+                    conn.execute(
+                        """
+                        INSERT INTO health_events (
+                            event_date,
+                            event_type,
+                            description,
+                            severity,
+                            notes
+                        )
+                        VALUES (?, ?, ?, ?, ?)
+                        """,
+                        (
+                            event_date,
+                            event_type,
+                            description,
+                            severity,
+                            notes
+                        )
+                    )
+
+        with sqlite3.connect(db_path) as conn:
+
+            conn.row_factory = sqlite3.Row
+
+            events = conn.execute(
+                """
+                SELECT *
+                FROM health_events
+                ORDER BY event_date DESC, id DESC
+                """
+            ).fetchall()
+
+        return render_template(
+            "timeline/health_timeline.html",
+            events=events
+        )
     return app
-
