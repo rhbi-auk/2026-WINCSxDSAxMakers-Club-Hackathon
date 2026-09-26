@@ -219,5 +219,12 @@ def create_app(test_config=None):
                 appointments=appointments
             )
 
+        # Medication Tracker
+        @app.route("/medication/tracker", methods=["GET"])
+        def medication_tracker():
+            return render_template(
+                "medication/tracker.html"
+            )
+
     return app
 

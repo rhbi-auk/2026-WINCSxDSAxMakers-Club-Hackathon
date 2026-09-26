@@ -40,15 +40,18 @@
           <!-- Include sidebar partial. -->
           
         
+
+
+
 {% if request.endpoint not in [
     'book_appointment',
     'my_appointments',
+    'medication_tracker',
     'authentication_bp.login',
     'authentication_bp.register'
 ] %}
     {% include 'sidebar.html' %}
 {% endif %}
-
 
 
         </div>
