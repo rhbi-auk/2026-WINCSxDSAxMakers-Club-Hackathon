@@ -1,249 +1,284 @@
+
 {% extends 'layout.html' %}
 
 {% block content %}
 
+<!-- English calendar -->
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+>
+
 <style>
-    .appointment-page {
+    /* Appointment page */
+    .booking-page {
         min-height: 85vh;
-        padding: 40px 20px;
-        background: linear-gradient(135deg, #f8f5ff, #e9e0ff);
+        padding: 50px 20px;
+        background: linear-gradient(
+            135deg,
+            #f8f5ff,
+            #ece4ff
+        );
         font-family: Arial, sans-serif;
+        box-sizing: border-box;
     }
 
-    .appointment-card {
+    /* White appointment card */
+    .booking-card {
+        width: 100%;
         max-width: 650px;
         margin: 0 auto;
-        padding: 40px;
-        background: white;
+        padding: 36px;
         border-radius: 22px;
-        box-shadow: 0 12px 40px rgba(104, 73, 155, 0.13);
+        background: white;
+        box-shadow: 0 12px 40px
+            rgba(104, 73, 155, 0.13);
+        box-sizing: border-box;
     }
 
-    .appointment-card h1 {
+    /* Title */
+    .booking-card h1 {
+        color: #7952b3;
         text-align: center;
-        color: #64439b;
-        margin-bottom: 10px;
+        font-size: 30px;
+        margin-bottom: 5px;
     }
 
-    .appointment-subtitle {
+    .booking-card p {
+        color: #777;
         text-align: center;
-        color: #81778e;
         margin-bottom: 30px;
     }
 
-    .form-field {
-        margin-bottom: 20px;
-    }
-
-    .form-field label {
+    /* Form labels */
+    .booking-card label {
         display: block;
-        margin-bottom: 8px;
+        margin: 18px 0 7px;
+        font-weight: bold;
         color: #40364f;
-        font-weight: 600;
     }
 
-    .form-field input,
-    .form-field select,
-    .form-field textarea {
+    /* Form fields */
+    .booking-card input,
+    .booking-card select,
+    .booking-card textarea {
         box-sizing: border-box;
         width: 100%;
         padding: 13px;
-        border: 1px solid #ddd4ef;
+        border: 1px solid #d8caef;
         border-radius: 10px;
-        background: #fcfbff;
-        font-size: 15px;
+        background: #fff;
+        font: inherit;
     }
 
-    .book-button {
+    .booking-card input:focus,
+    .booking-card select:focus,
+    .booking-card textarea:focus {
+        outline: none;
+        border-color: #8059c8;
+        box-shadow: 0 0 0 3px
+            rgba(128, 89, 200, 0.12);
+    }
+
+    /* Save button */
+    .booking-card button {
         width: 100%;
+        margin-top: 24px;
         padding: 14px;
-        border: none;
-        border-radius: 11px;
-        background: #8059c8;
         color: white;
-        font-size: 16px;
+        border: none;
+        border-radius: 10px;
+        background: #8059c8;
         font-weight: bold;
         cursor: pointer;
     }
 
-    .success-box {
-        padding: 22px;
-        background: #eefbf3;
-        border: 1px solid #b8e8ca;
-        border-radius: 12px;
-        color: #27663e;
-    }
-    #sidebar {
-        display: none;
+    .booking-card button:hover {
+        background: #6944b0;
     }
 
-    #main {
+    /* Expand appointment content */
+    #container:has(.booking-page) {
+        display: block;
         width: 100%;
+    }
+
+    #container:has(.booking-page) .booking-page {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Purple English calendar */
+    .flatpickr-calendar {
+        font-family: Arial, sans-serif;
+        border-radius: 14px;
+        box-shadow: 0 12px 30px
+            rgba(104, 73, 155, 0.16);
+    }
+
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover {
+        background: #8059c8;
+        border-color: #8059c8;
+    }
+
+    @media (max-width: 600px) {
+        .booking-page {
+            padding: 24px 12px;
+        }
+
+        .booking-card {
+            padding: 25px 20px;
+        }
     }
 </style>
 
+<main class="booking-page">
+    <div class="booking-card">
 
-<main id="main" class="appointment-page">
+        
+{% if success %}
+<div style="
+    background: #e7f6eb;
+    color: #246c3b;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+">
+    <strong>
+        Appointment request saved successfully!
+    </strong>
 
-    <div class="appointment-card">
+    <p>Status: Pending</p>
 
-        {% if success %}
+    <small>
+        Your request has been saved locally.
+        This is not a confirmed medical booking.
+    </small>
+</div>
+{% endif %}
+<h1>Book an Appointment</h1>
 
-            <div class="success-box">
+        <p>
+            Prepare for your next doctor visit.
+        </p>
 
-                <h2>✓ Appointment Confirmed</h2>
+        <form method="POST">
 
-                <p>Your appointment has been successfully booked.</p>
+            <!-- Patient name -->
+            <label for="patient_name">
+                Patient name
+            </label>
 
-                <p>
-                    <strong>Patient:</strong>
-                    {{ appointment.user_name }}
-                </p>
+            <input
+                type="text"
+                id="patient_name"
+                name="patient_name"
+                placeholder="Enter your full name"
+                required
+            >
 
-                <p>
-                    <strong>Appointment Type:</strong>
-                    {{ appointment.appointment_type }}
-                </p>
+            <!-- Appointment type -->
+            <label for="appointment_type">
+                Appointment type
+            </label>
 
-                <p>
-                    <strong>Doctor:</strong>
-                    {{ appointment.doctor }}
-                </p>
+            <select
+                id="appointment_type"
+                name="appointment_type"
+                required
+            >
+                <option value="">
+                    Select an option
+                </option>
 
-                <p>
-                    <strong>Date:</strong>
-                    {{ appointment.date }}
-                </p>
+                <option value="General consultation">
+                    General consultation
+                </option>
 
-                <p>
-                    <strong>Time:</strong>
-                    {{ appointment.time }}
-                </p>
+                <option value="Follow-up visit">
+                    Follow-up visit
+                </option>
 
-                <p>
-                    <strong>Reason:</strong>
-                    {{ appointment.reason }}
-                </p>
+                <option value="Health check-up">
+                    Health check-up
+                </option>
 
-            </div>
+                <option value="Other">
+                    Other
+                </option>
+            </select>
 
-        {% else %}
+            <!-- English date picker -->
+            <label for="appointment_date">
+                Preferred date
+            </label>
 
-            <h1>Book an Appointment</h1>
+            <input
+                type="text"
+                id="appointment_date"
+                name="appointment_date"
+                placeholder="MM/DD/YYYY"
+                autocomplete="off"
+                required
+            >
 
-            <p class="appointment-subtitle">
-                Choose your preferred appointment details below.
-            </p>
+            <!-- Preferred time -->
+            <label for="appointment_time">
+                Preferred time
+            </label>
 
-            <form method="POST">
+            <input
+                type="time"
+                id="appointment_time"
+                name="appointment_time"
+                required
+            >
 
-                <div class="form-field">
-                    <label for="appointment_type">Appointment Type</label>
+            <!-- Reason for visit -->
+            <label for="reason">
+                Reason for visit
+            </label>
 
-                    <select id="appointment_type"
-                            name="appointment_type"
-                            required>
+            <textarea
+                id="reason"
+                name="reason"
+                rows="4"
+                placeholder="What would you like to discuss?"
+            ></textarea>
 
-                        <option value="">Select appointment type</option>
+            <!-- Submit -->
+            <button type="submit">
+                Save Appointment Request
+            </button>
 
-                        <option value="General Consultation">
-                            General Consultation
-                        </option>
+        </form>
 
-                        <option value="Follow-up">
-                            Follow-up
-                        </option>
-
-                        <option value="Mental Health">
-                            Mental Health
-                        </option>
-
-                        <option value="Other">
-                            Other
-                        </option>
-
-                    </select>
-                </div>
-
-
-                <div class="form-field">
-                    <label for="doctor">Preferred Doctor</label>
-
-                    <select id="doctor"
-                            name="doctor"
-                            required>
-
-                        <option value="">Select a doctor</option>
-
-                        <option value="Dr Sarah Lee">
-                            Dr Sarah Lee
-                        </option>
-
-                        <option value="Dr James Chen">
-                            Dr James Chen
-                        </option>
-
-                        <option value="Dr Emily Wilson">
-                            Dr Emily Wilson
-                        </option>
-
-                    </select>
-                </div>
-
-
-                <div class="form-field">
-                    <label for="date">Preferred Date</label>
-
-                    <input type="date"
-                           id="date"
-                           name="date"
-                           required>
-                </div>
-
-
-                <div class="form-field">
-                    <label for="time">Preferred Time</label>
-
-                    <select id="time" name="time" required>
-                        <option value="">Select a time</option>
-                        <option value="09:00">9:00 AM</option>
-                        <option value="09:30">9:30 AM</option>
-                        <option value="10:00">10:00 AM</option>
-                        <option value="10:30">10:30 AM</option>
-                        <option value="11:00">11:00 AM</option>
-                        <option value="11:30">11:30 AM</option>
-                        <option value="13:00">1:00 PM</option>
-                        <option value="13:30">1:30 PM</option>
-                        <option value="14:00">2:00 PM</option>
-                        <option value="14:30">2:30 PM</option>
-                        <option value="15:00">3:00 PM</option>
-                        <option value="15:30">3:30 PM</option>
-                        <option value="16:00">4:00 PM</option>
-                    </select>
-                </div>
-
-
-                <div class="form-field">
-                    <label for="reason">Reason for Appointment</label>
-
-                    <textarea id="reason"
-                              name="reason"
-                              rows="5"
-                              placeholder="Briefly describe the reason for your appointment"
-                              required></textarea>
-                </div>
-
-
-                <button type="submit" class="book-button">
-                    Book Appointment
-                </button>
-
-            </form>
-
-        {% endif %}
+        <p style="
+            margin-top: 22px;
+            font-size: 12px;
+            color: #888;
+        ">
+            This is an appointment request,
+            not a confirmed medical booking.
+        </p>
 
     </div>
-
 </main>
+
+<!-- Flatpickr JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    flatpickr("#appointment_date", {
+        locale: "en",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "m/d/Y",
+        minDate: "today",
+        allowInput: false
+    });
+</script>
 
 {% endblock %}
