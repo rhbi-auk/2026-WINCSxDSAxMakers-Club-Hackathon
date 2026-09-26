@@ -53,6 +53,12 @@ def create_app(test_config=None):
             utilities.utilities_blueprint
         )
 
+        from .doctor_visit_prep import doctor_visit_prep
+
+        app.register_blueprint(
+            doctor_visit_prep.doctor_visit_prep_blueprint
+        )
+
         # --------------------------------
         # Appointment database
         # --------------------------------
