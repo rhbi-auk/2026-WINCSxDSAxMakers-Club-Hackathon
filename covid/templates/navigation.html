@@ -6,7 +6,7 @@
         <div style="font-size:45px;">💜</div>
         <h2 style="color:white; font-size:20px;">
             Health Companion
-        </h2>
+        /h2>
         <p style="color:#e5d8ff; font-size:12px;">
             Your Health, Our Priority
         </p>
@@ -38,12 +38,13 @@
     Doctor Visit Prep
     </a>
 
-    <span class="btn-nav"
-          style="display:block; opacity:0.6;">
-        Health Timeline (Coming Soon)
-    </span>
+<a class="btn-nav"
+   href="{{ url_for('health_timeline') }}">
+    Health Timeline
+</a>
 
     
+
 <a class="btn-nav"
    href="{{ url_for('medication_tracker') }}">
     Medication Tracker

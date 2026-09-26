@@ -2,6 +2,12 @@
 
 {% block content %}
 
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+>
+
+
 <style>
     /* 不显示原 COVID 网页右侧绿色 sidebar */
     #sidebar {
@@ -172,11 +178,16 @@
                 <div class="form-field">
                     <label for="event_date">Date</label>
 
+
                     <input
-                        type="date"
+                        type="text"
                         id="event_date"
                         name="event_date"
-                        required>
+                        placeholder="DD/MM/YYYY"
+                        autocomplete="off"
+                        required
+                    >
+
                 </div>
 
 
@@ -350,5 +361,18 @@
     </div>
 
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    flatpickr("#event_date", {
+        locale: "en",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        allowInput: false
+    });
+</script>
+
 
 {% endblock %}
