@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, redirect, url_for, session
+from flask import Blueprint, url_for
 
 import covid.adapters.repository as repo
 import covid.utilities.services as services
@@ -16,11 +16,3 @@ def get_tags_and_urls():
         tag_urls[tag_name] = url_for('news_bp.articles_by_tag', tag=tag_name)
 
     return tag_urls
-
-
-def get_selected_articles(quantity=3):
-    articles = services.get_random_articles(quantity, repo.repo_instance)
-
-    for article in articles:
-        article['hyperlink'] = url_for('news_bp.articles_by_date', date=article['date'].isoformat())
-    return articles

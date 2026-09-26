@@ -188,19 +188,31 @@
     .delete-button {
         display: inline-block;
         padding: 10px 16px;
-        border: 1px solid #8059c8;
         border-radius: 8px;
-        color: #7952b3;
         background: white;
         font: inherit;
         cursor: pointer;
         text-decoration: none;
     }
 
-    .prep-link:hover,
-    .delete-button:hover {
+    .prep-link {
+        border: 1px solid #8059c8;
+        color: #7952b3;
+    }
+
+    .prep-link:hover {
         color: white;
         background: #8059c8;
+    }
+
+    .delete-button {
+        border: 1px solid #b83f4d;
+        color: #a83240;
+    }
+
+    .delete-button:hover {
+        color: white;
+        background: #b83f4d;
     }
 
     .delete-confirmation {
@@ -232,6 +244,73 @@
         line-height: 1.5;
     }
 
+    .appointment-details-dialog {
+        width: min(440px, calc(100% - 32px));
+        margin: auto;
+        padding: 26px;
+        border: 0;
+        border-radius: 16px;
+        color: #40364f;
+        background: white;
+        box-shadow: 0 12px 40px rgba(104, 73, 155, 0.2);
+        font-family: Arial, sans-serif;
+        animation: confirmation-pop .16s ease-out;
+    }
+
+    .appointment-details-dialog::backdrop {
+        background: rgba(49, 39, 66, 0.32);
+    }
+
+    .appointment-details-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .appointment-details-heading h2 {
+        margin: 0 0 5px;
+        color: #64439b;
+        font-size: 20px;
+    }
+
+    .appointment-details-heading p {
+        margin: 0;
+        color: #6d6477;
+    }
+
+    .appointment-details-close {
+        display: grid;
+        flex: 0 0 36px;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        border: 1px solid #d8caef;
+        border-radius: 50%;
+        color: #64439b;
+        background: white;
+        cursor: pointer;
+    }
+
+    .appointment-details-list {
+        display: grid;
+        gap: 12px;
+        margin: 0;
+    }
+
+    .appointment-details-row dt {
+        color: #81778e;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .appointment-details-row dd {
+        margin: 3px 0 0;
+        color: #40364f;
+        overflow-wrap: anywhere;
+    }
+
     .confirmation-actions {
         display: flex;
         justify-content: flex-end;
@@ -253,8 +332,13 @@
     }
 
     .confirm-delete {
+        border-color: #b83f4d;
         color: white;
-        background: #8059c8;
+        background: #b83f4d;
+    }
+
+    .confirm-delete:hover {
+        background: #982f3d;
     }
 
     @keyframes confirmation-pop {
@@ -263,7 +347,8 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-        .delete-confirmation { animation: none; }
+        .delete-confirmation,
+        .appointment-details-dialog { animation: none; }
     }
 
     .status-badge {
@@ -273,19 +358,14 @@
         font-weight: bold;
     }
 
-    .status-pending {
-        background: #fff0c2;
-        color: #856300;
+    .status-past {
+        background: #eeeeee;
+        color: #605b68;
     }
 
-    .status-completed {
-        background: #dff3e3;
-        color: #256a3c;
-    }
-
-    .status-missed {
-        background: #fbe0e0;
-        color: #a13333;
+    .status-upcoming {
+        background: #eee6ff;
+        color: #64439b;
     }
 
     .log-link {
@@ -359,8 +439,8 @@
                 {{ appointment["appointment_type"] }}
             </h2>
 
-            <span class="status-badge status-{{ appointment['status'] | lower }}">
-                {{ appointment["status"] }}
+            <span class="status-badge {% if appointment['appointment_date'] < today %}status-past{% else %}status-upcoming{% endif %}">
+                {% if appointment['appointment_date'] < today %}Past appointment{% else %}Upcoming{% endif %}
             </span>
 
             <p>
@@ -385,8 +465,16 @@
 
             <div class="appointment-actions">
                 <a class="prep-link"
-                   href="{{ url_for('appointment_visit_prep', appointment_id=appointment['id']) }}">
-                    {% if appointment['has_prep'] %}Open doctor visit preparation notes{% else %}Create doctor visit preparation notes{% endif %}
+                         href="{{ url_for('doctor_visit_prep_bp.doctor_visit_prep', appointment_id=appointment['id']) }}">
+                    {% if appointment['has_prep'] %}Open doctor visit preparation notes{% else %}Add doctor visit preparation notes{% endif %}
+                </a>
+                <a class="prep-link"
+                   href="{{ url_for('health_timeline', appointment_id=appointment['id']) }}">
+                    {% if appointment['timeline_entry_count'] %}Open health timeline ({{ appointment['timeline_entry_count'] }}){% else %}Add health timeline entry{% endif %}
+                </a>
+                <a class="prep-link"
+                   href="{{ url_for('medication_tracker', appointment_id=appointment['id']) }}">
+                    {% if appointment['medication_entry_count'] %}Open medication tracker ({{ appointment['medication_entry_count'] }}){% else %}Add medication entry{% endif %}
                 </a>
                 <form method="POST"
                       action="{{ url_for('delete_appointment', appointment_id=appointment['id']) }}">
@@ -421,6 +509,29 @@
     <div class="confirmation-actions">
         <button class="keep-appointment" type="button" data-cancel-delete>Keep appointment</button>
         <button class="confirm-delete" type="button" data-confirm-delete>Delete appointment</button>
+    </div>
+</dialog>
+
+<dialog class="appointment-details-dialog" id="appointment-details-dialog"
+        aria-labelledby="appointment-details-title">
+    <div class="appointment-details-heading">
+        <div>
+            <h2 id="appointment-details-title">Appointment details</h2>
+            <p id="appointment-details-type"></p>
+        </div>
+        <button class="appointment-details-close" type="button" data-close-appointment-details aria-label="Close appointment details">
+            <span class="material-icons" aria-hidden="true">close</span>
+        </button>
+    </div>
+    <dl class="appointment-details-list">
+        <div class="appointment-details-row"><dt>Date</dt><dd id="appointment-details-date"></dd></div>
+        <div class="appointment-details-row"><dt>Doctor</dt><dd id="appointment-details-doctor"></dd></div>
+        <div class="appointment-details-row"><dt>Time</dt><dd id="appointment-details-time"></dd></div>
+        <div class="appointment-details-row"><dt>Reason</dt><dd id="appointment-details-reason"></dd></div>
+        <div class="appointment-details-row"><dt>Status</dt><dd id="appointment-details-status"></dd></div>
+    </dl>
+    <div class="confirmation-actions">
+        <button class="keep-appointment" type="button" data-close-appointment-details>Close</button>
     </div>
 </dialog>
 
@@ -474,21 +585,14 @@
             events: events,
             eventClick: function (info) {
                 const event = info.event;
-                let message = event.title + "\n\nDate: " + event.startStr;
-
-                if (event.extendedProps.doctor) {
-                    message += "\nDoctor: " + event.extendedProps.doctor;
-                }
-                if (event.extendedProps.time) {
-                    message += "\nTime: " + event.extendedProps.time;
-                }
-                if (event.extendedProps.reason) {
-                    message += "\nReason: " + event.extendedProps.reason;
-                }
-
-                message += "\nStatus: " + event.extendedProps.status;
-
-                alert(message);
+                const appointmentDate = new Date(event.startStr + "T12:00:00");
+                document.querySelector("#appointment-details-type").textContent = event.title;
+                document.querySelector("#appointment-details-date").textContent = appointmentDate.toLocaleDateString();
+                document.querySelector("#appointment-details-doctor").textContent = event.extendedProps.doctor || "Not provided";
+                document.querySelector("#appointment-details-time").textContent = event.extendedProps.time || "Not provided";
+                document.querySelector("#appointment-details-reason").textContent = event.extendedProps.reason || "Not provided";
+                document.querySelector("#appointment-details-status").textContent = event.extendedProps.status || "Not provided";
+                document.querySelector("#appointment-details-dialog").showModal();
             }
         });
 
@@ -496,6 +600,7 @@
 
         // Delete confirmation dialog wiring
         const deleteConfirmation = document.querySelector('#delete-confirmation');
+        const appointmentDetailsDialog = document.querySelector('#appointment-details-dialog');
         const appointmentsContainer = document.querySelector('.appointments-container');
         let pendingDeleteForm = null;
 
@@ -525,6 +630,14 @@
 
         deleteConfirmation.addEventListener('close', () => {
             pendingDeleteForm = null;
+        });
+
+        document.querySelectorAll('[data-close-appointment-details]').forEach((button) => {
+            button.addEventListener('click', () => appointmentDetailsDialog.close());
+        });
+
+        appointmentDetailsDialog.addEventListener('click', (event) => {
+            if (event.target === appointmentDetailsDialog) appointmentDetailsDialog.close();
         });
 
     });

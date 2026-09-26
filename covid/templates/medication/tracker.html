@@ -81,6 +81,28 @@
         background: #6944b0;
     }
 
+    .medication-button:disabled {
+        opacity: .55;
+        cursor: not-allowed;
+    }
+
+    .medication-entry {
+        margin-top: 16px;
+        padding: 16px;
+        border-radius: 12px;
+        background: #f8f5ff;
+        color: #40364f;
+    }
+
+    .medication-entry h3 {
+        margin: 0 0 8px;
+        color: #64439b;
+    }
+
+    .medication-entry p {
+        margin: 6px 0;
+    }
+
     #container:has(.medication-page) {
         display: block;
         width: 100%;
@@ -103,7 +125,27 @@
             Keep your medication routine organised.
         </p>
 
+        {% if success %}
+        <p role="status">Medication entry linked to the appointment.</p>
+        {% endif %}
+        {% if error %}
+        <p role="alert">{{ error }}</p>
+        {% endif %}
+        {% if not appointments %}
+        <p role="status">Log an appointment first to link medication details to a visit. <a href="{{ url_for('log_appointment') }}">Log appointment</a></p>
+        {% endif %}
+
         <form method="POST">
+
+            <label for="medication-appointment">Link to appointment</label>
+            <select id="medication-appointment" name="appointment_id" required>
+                <option value="">Select an appointment</option>
+                {% for appointment in appointments %}
+                <option value="{{ appointment['id'] }}" {% if selected_appointment and selected_appointment['id'] == appointment['id'] %}selected{% endif %}>
+                    {{ appointment['appointment_date'] }} · {{ appointment['doctor_name'] }} · {{ appointment['appointment_type'] }}
+                </option>
+                {% endfor %}
+            </select>
 
             <label for="medicine_name">
                 Medication Name
@@ -186,11 +228,25 @@
             <button
                 type="submit"
                 class="medication-button"
+                {% if not appointments %}disabled{% endif %}
             >
                 Add Medication
             </button>
 
         </form>
+
+        <h2>Logged medications</h2>
+        {% for medication in medications %}
+        <div class="medication-entry">
+            <h3>{{ medication['medicine_name'] }} · {{ medication['dose'] }}</h3>
+            <p>{{ medication['frequency'] }}{% if medication['medication_time'] %} · {{ medication['medication_time'] }}{% endif %}</p>
+            <p>Started {{ medication['start_date'] }}</p>
+            {% if medication['notes'] %}<p>{{ medication['notes'] }}</p>{% endif %}
+            <small>For {{ medication['doctor_name'] }} · {{ medication['appointment_type'] }}</small>
+        </div>
+        {% else %}
+        <p>No medication entries linked to this appointment yet.</p>
+        {% endfor %}
 
     </div>
 

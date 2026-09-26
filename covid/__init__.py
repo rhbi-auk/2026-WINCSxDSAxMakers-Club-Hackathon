@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import date, time
 import sqlite3
 
-from flask import Flask, render_template, request, redirect, url_for, abort
+from flask import Flask, render_template, request, redirect, url_for, abort, session
 
 import covid.adapters.repository as repo
 from covid.adapters.memory_repository import MemoryRepository, populate
@@ -75,6 +75,7 @@ def create_app(test_config=None):
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS appointments (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    owner_user_name TEXT NOT NULL,
                     doctor_name TEXT NOT NULL,
                     appointment_type TEXT NOT NULL,
                     appointment_date TEXT NOT NULL,
@@ -93,6 +94,20 @@ def create_app(test_config=None):
                     "ALTER TABLE appointments RENAME COLUMN patient_name TO doctor_name"
                 )
 
+            columns = {
+                row[1]
+                for row in conn.execute("PRAGMA table_info(appointments)")
+            }
+            if "owner_user_name" not in columns:
+                conn.execute(
+                    "ALTER TABLE appointments ADD COLUMN owner_user_name TEXT"
+                )
+
+            conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_appointments_owner
+                ON appointments (owner_user_name)
+            """)
+
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS appointment_preparation (
                     appointment_id INTEGER PRIMARY KEY,
@@ -106,6 +121,35 @@ def create_app(test_config=None):
                 )
             """)
 
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS health_timeline_entries (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    appointment_id INTEGER NOT NULL,
+                    owner_user_name TEXT NOT NULL,
+                    event_date TEXT NOT NULL,
+                    event_type TEXT NOT NULL,
+                    description TEXT NOT NULL,
+                    severity TEXT NOT NULL DEFAULT '',
+                    notes TEXT NOT NULL DEFAULT '',
+                    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS medication_entries (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    appointment_id INTEGER NOT NULL,
+                    owner_user_name TEXT NOT NULL,
+                    medicine_name TEXT NOT NULL,
+                    dose TEXT NOT NULL,
+                    frequency TEXT NOT NULL,
+                    medication_time TEXT NOT NULL DEFAULT '',
+                    start_date TEXT NOT NULL,
+                    notes TEXT NOT NULL DEFAULT '',
+                    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
+                )
+            """)
+
         # --------------------------------
         # Log appointment
         # --------------------------------
@@ -114,6 +158,7 @@ def create_app(test_config=None):
             "/appointment/log",
             methods=["GET", "POST"]
         )
+        @authentication.login_required
         def log_appointment():
 
             # Display log-entry page
@@ -199,15 +244,17 @@ def create_app(test_config=None):
                 conn.execute(
                     """
                     INSERT INTO appointments (
+                        owner_user_name,
                         doctor_name,
                         appointment_type,
                         appointment_date,
                         appointment_time,
                         reason
                     )
-                    VALUES (?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?)
                     """,
                     (
+                        session["user_name"],
                         doctor_name,
                         appointment_type,
                         selected_date.isoformat(),
@@ -226,6 +273,7 @@ def create_app(test_config=None):
 
         # My Appointments page
         @app.route("/appointment/my")
+        @authentication.login_required
         def my_appointments():
             sort_by = request.args.get("sort", "date")
             sort_orders = {
@@ -245,130 +293,243 @@ def create_app(test_config=None):
                                SELECT 1
                                FROM appointment_preparation
                                WHERE appointment_preparation.appointment_id = appointments.id
-                           ) AS has_prep
+                           ) AS has_prep,
+                           (
+                               SELECT COUNT(*)
+                               FROM health_timeline_entries
+                               WHERE health_timeline_entries.appointment_id = appointments.id
+                           ) AS timeline_entry_count,
+                           (
+                               SELECT COUNT(*)
+                               FROM medication_entries
+                               WHERE medication_entries.appointment_id = appointments.id
+                           ) AS medication_entry_count
                     FROM appointments
+                    WHERE appointments.owner_user_name = ?
                     ORDER BY {sort_orders[sort_by]}
-                """).fetchall()
+                """, (session["user_name"],)).fetchall()
 
             return render_template(
                 "appointment/my_appointments.html",
                 appointments=appointments,
-                sort_by=sort_by
+                sort_by=sort_by,
+                today=date.today().isoformat()
             )
 
 
         # Medication Tracker
-        @app.route("/medication/tracker", methods=["GET"])
+        @app.route("/medication/tracker", methods=["GET", "POST"])
+        @authentication.login_required
         def medication_tracker():
+            appointment_id = request.args.get("appointment_id", type=int)
+            error = None
+            success = False
+
+            with sqlite3.connect(db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                appointments = conn.execute(
+                    "SELECT * FROM appointments WHERE owner_user_name = ? ORDER BY appointment_date DESC, appointment_time DESC",
+                    (session["user_name"],)
+                ).fetchall()
+
+                if request.method == "POST":
+                    try:
+                        appointment_id = int(request.form.get("appointment_id", ""))
+                    except ValueError:
+                        appointment_id = None
+
+                    appointment = conn.execute(
+                        "SELECT * FROM appointments WHERE id = ? AND owner_user_name = ?",
+                        (appointment_id, session["user_name"])
+                    ).fetchone() if appointment_id is not None else None
+
+                    if appointment is None:
+                        abort(404)
+
+                    medicine = {
+                        field: request.form.get(field, "").strip()
+                        for field in (
+                            "medicine_name", "dose", "frequency",
+                            "medication_time", "start_date", "notes"
+                        )
+                    }
+                    if not all(medicine[field] for field in ("medicine_name", "dose", "frequency", "start_date")):
+                        error = "Please complete the medication name, dose, frequency, and start date."
+                    else:
+                        conn.execute("""
+                            INSERT INTO medication_entries (
+                                appointment_id, owner_user_name, medicine_name,
+                                dose, frequency, medication_time, start_date, notes
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (
+                            appointment_id,
+                            session["user_name"],
+                            medicine["medicine_name"],
+                            medicine["dose"],
+                            medicine["frequency"],
+                            medicine["medication_time"],
+                            medicine["start_date"],
+                            medicine["notes"]
+                        ))
+                        success = True
+
+                selected_appointment = next(
+                    (item for item in appointments if item["id"] == appointment_id),
+                    None
+                )
+                if appointment_id is not None and selected_appointment is None:
+                    abort(404)
+
+                medication_query = """
+                    SELECT medication_entries.*, appointments.doctor_name,
+                           appointments.appointment_type
+                    FROM medication_entries
+                    JOIN appointments ON appointments.id = medication_entries.appointment_id
+                    WHERE medication_entries.owner_user_name = ?
+                """
+                query_values = [session["user_name"]]
+                if selected_appointment is not None:
+                    medication_query += " AND medication_entries.appointment_id = ?"
+                    query_values.append(selected_appointment["id"])
+                medication_query += " ORDER BY medication_entries.start_date DESC, medication_entries.id DESC"
+                medications = conn.execute(medication_query, query_values).fetchall()
+
             return render_template(
-                "medication/tracker.html"
+                "medication/tracker.html",
+                appointments=appointments,
+                selected_appointment=selected_appointment,
+                medications=medications,
+                success=success,
+                error=error
             )
 
         # Delete appointment
         @app.route(
             "/appointment/<int:appointment_id>/prep",
-            methods=["GET", "POST"]
+            methods=["GET"]
         )
+        @authentication.login_required
         def appointment_visit_prep(appointment_id):
-            field_names = (
-                "main_concern",
-                "start_date",
-                "duration_frequency",
-                "current_medications",
-                "allergies",
-                "questions"
-            )
-            success = False
-
-            with sqlite3.connect(db_path) as conn:
-                conn.row_factory = sqlite3.Row
-                appointment = conn.execute(
-                    "SELECT * FROM appointments WHERE id = ?",
-                    (appointment_id,)
-                ).fetchone()
-                if appointment is None:
-                    abort(404)
-
-                existing_notes = conn.execute(
-                    "SELECT * FROM appointment_preparation WHERE appointment_id = ?",
-                    (appointment_id,)
-                ).fetchone()
-                prep_notes = {
-                    field: existing_notes[field] if existing_notes else ""
-                    for field in field_names
-                }
-
-                if request.method == "POST":
-                    prep_notes = {
-                        field: request.form.get(field, "").strip()
-                        for field in field_names
-                    }
-                    if not prep_notes["main_concern"] or not prep_notes["start_date"]:
-                        return render_template(
-                            "doctor_visit_prep/doctor_visit_prep.html",
-                            appointment=appointment,
-                            prep_notes=prep_notes,
-                            error="Please complete the main concern and start date."
-                        ), 400
-
-                    conn.execute("""
-                        INSERT INTO appointment_preparation (
-                            appointment_id,
-                            main_concern,
-                            start_date,
-                            duration_frequency,
-                            current_medications,
-                            allergies,
-                            questions
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?)
-                        ON CONFLICT(appointment_id) DO UPDATE SET
-                            main_concern = excluded.main_concern,
-                            start_date = excluded.start_date,
-                            duration_frequency = excluded.duration_frequency,
-                            current_medications = excluded.current_medications,
-                            allergies = excluded.allergies,
-                            questions = excluded.questions
-                    """, (
-                        appointment_id,
-                        prep_notes["main_concern"],
-                        prep_notes["start_date"],
-                        prep_notes["duration_frequency"],
-                        prep_notes["current_medications"],
-                        prep_notes["allergies"],
-                        prep_notes["questions"]
-                    ))
-                    success = True
-
-            return render_template(
-                "doctor_visit_prep/doctor_visit_prep.html",
-                appointment=appointment,
-                prep_notes=prep_notes,
-                success=success
+            return redirect(
+                url_for(
+                    "doctor_visit_prep_bp.doctor_visit_prep",
+                    appointment_id=appointment_id
+                )
             )
 
         @app.route(
             "/appointment/<int:appointment_id>/delete",
             methods=["POST"]
         )
+        @authentication.login_required
         def delete_appointment(appointment_id):
 
             with sqlite3.connect(db_path) as conn:
+                owned_appointment = conn.execute(
+                    "SELECT 1 FROM appointments WHERE id = ? AND owner_user_name = ?",
+                    (appointment_id, session["user_name"])
+                ).fetchone()
+                if owned_appointment is None:
+                    abort(404)
+
                 conn.execute(
                     "DELETE FROM appointment_preparation WHERE appointment_id = ?",
                     (appointment_id,)
                 )
                 conn.execute(
-                    "DELETE FROM appointments WHERE id = ?",
-                    (appointment_id,)
+                    "DELETE FROM appointments WHERE id = ? AND owner_user_name = ?",
+                    (appointment_id, session["user_name"])
                 )
 
             return redirect(url_for("my_appointments"))
         
         # Health Timeline
-        @app.route("/health-timeline", methods=["GET"])
+        @app.route("/health-timeline", methods=["GET", "POST"])
+        @authentication.login_required
         def health_timeline():
+            appointment_id = request.args.get("appointment_id", type=int)
+            error = None
+            success = False
+
+            with sqlite3.connect(db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                appointments = conn.execute(
+                    "SELECT * FROM appointments WHERE owner_user_name = ? ORDER BY appointment_date DESC, appointment_time DESC",
+                    (session["user_name"],)
+                ).fetchall()
+
+                if request.method == "POST":
+                    try:
+                        appointment_id = int(request.form.get("appointment_id", ""))
+                    except ValueError:
+                        appointment_id = None
+
+                    appointment = conn.execute(
+                        "SELECT * FROM appointments WHERE id = ? AND owner_user_name = ?",
+                        (appointment_id, session["user_name"])
+                    ).fetchone() if appointment_id is not None else None
+                    if appointment is None:
+                        abort(404)
+
+                    event_date = request.form.get("event_date", "").strip()
+                    event_type = request.form.get("event_type", "").strip()
+                    description = request.form.get("description", "").strip()
+                    severity = request.form.get("severity", "").strip()
+                    notes = request.form.get("notes", "").strip()
+                    allowed_event_types = {"Symptom", "Medication", "Doctor Visit", "Test", "Other"}
+                    allowed_severities = {"", "Mild", "Moderate", "Severe"}
+                    try:
+                        event_date = date.fromisoformat(event_date).isoformat()
+                    except ValueError:
+                        error = "Please provide a valid event date."
+                    if not error and (not description or event_type not in allowed_event_types or severity not in allowed_severities):
+                        error = "Please complete the event type and description."
+
+                    if not error:
+                        conn.execute("""
+                            INSERT INTO health_timeline_entries (
+                                appointment_id, owner_user_name, event_date,
+                                event_type, description, severity, notes
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """, (
+                            appointment_id,
+                            session["user_name"],
+                            event_date,
+                            event_type,
+                            description,
+                            severity,
+                            notes
+                        ))
+                        success = True
+
+                selected_appointment = next(
+                    (item for item in appointments if item["id"] == appointment_id),
+                    None
+                )
+                if appointment_id is not None and selected_appointment is None:
+                    abort(404)
+
+                events_query = """
+                    SELECT health_timeline_entries.*, appointments.doctor_name,
+                           appointments.appointment_type
+                    FROM health_timeline_entries
+                    JOIN appointments ON appointments.id = health_timeline_entries.appointment_id
+                    WHERE health_timeline_entries.owner_user_name = ?
+                """
+                query_values = [session["user_name"]]
+                if selected_appointment is not None:
+                    events_query += " AND health_timeline_entries.appointment_id = ?"
+                    query_values.append(selected_appointment["id"])
+                events_query += " ORDER BY health_timeline_entries.event_date DESC, health_timeline_entries.id DESC"
+                events = conn.execute(events_query, query_values).fetchall()
+
             return render_template(
-                "timeline/health_timeline.html"
+                "timeline/health_timeline.html",
+                appointments=appointments,
+                selected_appointment=selected_appointment,
+                events=events,
+                success=success,
+                error=error
             )
 
 

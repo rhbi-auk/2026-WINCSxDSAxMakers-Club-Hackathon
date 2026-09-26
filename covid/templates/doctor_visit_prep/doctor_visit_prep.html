@@ -101,7 +101,12 @@
         background: #6944b0;
     }
 
-    /* Expand content and remove right green sidebar */
+    .booking-card button:disabled {
+        opacity: .55;
+        cursor: not-allowed;
+    }
+
+    /* Expand appointment preparation content */
     #container:has(.booking-page) {
         display: block;
         width: 100%;
@@ -110,10 +115,6 @@
     #container:has(.booking-page) .booking-page {
         width: 100%;
         box-sizing: border-box;
-    }
-
-    #sidebar {
-        display: none !important;
     }
 
     /* Purple English calendar */
@@ -177,6 +178,12 @@
             {{ error }}
         </div>
         {% endif %}
+        {% if not appointments %}
+        <div style="margin-bottom:20px; text-align:center; color:#64439b;">
+            Log an appointment first to link preparation notes to a visit.
+            <a href="{{ url_for('log_appointment') }}">Log appointment</a>
+        </div>
+        {% endif %}
 
         <h1>Doctor Visit Prep</h1>
 
@@ -185,10 +192,20 @@
             Preparation notes for {{ appointment["doctor_name"] }}'s {{ appointment["appointment_type"] }} on {{ appointment["appointment_date"] }}.
         </p>
         {% else %}
-        <p>Prepare for your next doctor visit.</p>
+        <p>Choose an appointment and prepare for your visit.</p>
         {% endif %}
 
-        <form method="POST"{% if appointment %} action="{{ url_for('appointment_visit_prep', appointment_id=appointment['id']) }}"{% endif %}>
+        <form method="POST" action="{{ url_for('doctor_visit_prep_bp.doctor_visit_prep') }}">
+
+            <label for="prep-appointment">Link to appointment</label>
+            <select id="prep-appointment" name="appointment_id" required>
+                <option value="">Select an appointment</option>
+                {% for item in appointments %}
+                <option value="{{ item['id'] }}" {% if appointment and appointment['id'] == item['id'] %}selected{% endif %}>
+                    {{ item['appointment_date'] }} · {{ item['doctor_name'] }} · {{ item['appointment_type'] }}
+                </option>
+                {% endfor %}
+            </select>
 
             <!-- Main concern / Symptoms -->
             <label for="main_concern">
@@ -267,7 +284,7 @@
             >{{ prep_notes.questions if prep_notes else '' }}</textarea>
 
             <!-- Submit -->
-            <button type="submit">
+            <button type="submit" {% if not appointments %}disabled{% endif %}>
                 Save Visit Prep
             </button>
 

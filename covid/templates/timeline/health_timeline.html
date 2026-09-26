@@ -9,11 +9,6 @@
 
 
 <style>
-    /* 不显示原 COVID 网页右侧绿色 sidebar */
-    #sidebar {
-        display: none;
-    }
-
     #container:has(.timeline-page) {
         display: block;
         width: 100%;
@@ -173,7 +168,29 @@
                 Record important changes in your health over time.
             </p>
 
+            {% if success %}
+            <p role="status">Timeline entry saved to this appointment.</p>
+            {% endif %}
+            {% if error %}
+            <p role="alert">{{ error }}</p>
+            {% endif %}
+            {% if not appointments %}
+            <p role="status">Log an appointment first to link timeline events to a visit. <a href="{{ url_for('log_appointment') }}">Log appointment</a></p>
+            {% endif %}
+
             <form method="POST">
+
+                <div class="form-field">
+                    <label for="timeline-appointment">Link to appointment</label>
+                    <select id="timeline-appointment" name="appointment_id" required>
+                        <option value="">Select an appointment</option>
+                        {% for appointment in appointments %}
+                        <option value="{{ appointment['id'] }}" {% if selected_appointment and selected_appointment['id'] == appointment['id'] %}selected{% endif %}>
+                            {{ appointment['appointment_date'] }} · {{ appointment['doctor_name'] }} · {{ appointment['appointment_type'] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
                 <div class="form-field">
                     <label for="event_date">Date</label>
@@ -285,7 +302,8 @@
 
                 <button
                     type="submit"
-                    class="add-button">
+                    class="add-button"
+                    {% if not appointments %}disabled{% endif %}>
 
                     + Add to Timeline
 
@@ -313,6 +331,10 @@
 
                     <div class="event-type">
                         {{ event["event_type"] }}
+                    </div>
+
+                    <div class="event-description">
+                        Linked appointment: {{ event["doctor_name"] }} · {{ event["appointment_type"] }}
                     </div>
 
 

@@ -40,15 +40,6 @@ img {
   margin-right: auto;
 }
 
-.img-small {
-    display: block;
-    width: 300px;
-    height: auto;
-    padding: 5px;
-    margin-left: auto;
-    margin-right:auto;
-}
-
 .btn-nav {
   padding: 10px;
   border-bottom: 1px solid rgba(254, 206, 241, 0.24);
@@ -169,16 +160,6 @@ img {
   width: 150px;
 }
 
-#sidebar {
-  background-color: #FECEF1;
-  color: #243342;
-    width: 33.333333%;
-    min-height: 100vh;
-    height: 100%;
-    padding: 20px;
-    border-bottom: 1px solid #EF9CDA;
-}
-
 #article-header {
     text-align: left;
     margin-top: 20px;
@@ -192,13 +173,6 @@ img {
 
 #article-footer {
     font-size: 32px;
-}
-
-#article-container {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    margin-top: 30px;
 }
 
 input[type='text'],

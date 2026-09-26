@@ -76,7 +76,6 @@ def articles_by_date():
             title='Articles',
             articles_title=target_date.strftime('%A %B %e %Y'),
             articles=articles,
-            selected_articles=utilities.get_selected_articles(len(articles) * 2),
             tag_urls=utilities.get_tags_and_urls(),
             first_article_url=first_article_url,
             last_article_url=last_article_url,
@@ -148,7 +147,6 @@ def articles_by_tag():
         title='Articles',
         articles_title='Articles tagged by ' + tag_name,
         articles=articles,
-        selected_articles=utilities.get_selected_articles(len(articles) * 2),
         tag_urls=utilities.get_tags_and_urls(),
         first_article_url=first_article_url,
         last_article_url=last_article_url,
@@ -205,7 +203,6 @@ def comment_on_article():
         article=article,
         form=form,
         handler_url=url_for('news_bp.comment_on_article'),
-        selected_articles=utilities.get_selected_articles(),
         tag_urls=utilities.get_tags_and_urls()
     )
 
