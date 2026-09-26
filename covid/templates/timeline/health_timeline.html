@@ -169,7 +169,22 @@
             </p>
 
             {% if success %}
-            <p role="status">Timeline entry saved to this appointment.</p>
+            <div style="
+                background: #e7f6eb;
+                color: #246c3b;
+                padding: 16px;
+                border-radius: 12px;
+                margin-bottom: 20px;
+                text-align: center;
+            ">
+                <strong>Timeline entry saved successfully!</strong>
+                <p>You will be redirected in 3 seconds.</p>
+            </div>
+            <script>
+                setTimeout(function() {
+                    window.location.href = "{{ url_for('my_appointments') }}";
+                }, 3000);
+            </script>
             {% endif %}
             {% if error %}
             <p role="alert">{{ error }}</p>

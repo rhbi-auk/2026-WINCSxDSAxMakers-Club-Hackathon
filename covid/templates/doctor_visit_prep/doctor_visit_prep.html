@@ -159,12 +159,18 @@
             </strong>
 
             <p>Your preparation notes have been saved.</p>
+            <p>You will be redirected in 3 seconds.</p>
 
             <small>
                 This is a visit preparation record,
                 not a medical diagnosis.
             </small>
         </div>
+        <script>
+            setTimeout(function() {
+                window.location.href = "{{ url_for('my_appointments') }}";
+            }, 3000);
+        </script>
         {% endif %}
         {% if error %}
         <div style="

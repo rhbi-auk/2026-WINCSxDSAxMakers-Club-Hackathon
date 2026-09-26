@@ -150,12 +150,19 @@
     </strong>
 
     <p>Saved to your records.</p>
+    
+    <p>You will be redirected in 3 seconds.</p>
 
     <small>
         This entry is stored in your personal appointment log only.
         It does not book, request, or confirm anything with a healthcare provider.
     </small>
 </div>
+<script>
+    setTimeout(function() {
+        window.location.href = "{{ url_for('my_appointments') }}";
+    }, 3000);
+</script>
 {% endif %}
 <h1>Log an Appointment</h1>
 
