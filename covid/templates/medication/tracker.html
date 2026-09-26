@@ -1,84 +1,17 @@
-
 {% extends 'layout.html' %}
 
 {% block content %}
+
 <link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
 >
+
 <style>
-    .medication-page {
-        min-height: 85vh;
-        padding: 50px 20px;
-        background: linear-gradient(135deg, #f8f5ff, #eee6ff);
-        font-family: Arial, sans-serif;
-        box-sizing: border-box;
-    }
 
-    .medication-card {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 40px;
-        background: white;
-        border-radius: 22px;
-        box-shadow: 0 12px 40px rgba(104, 73, 155, 0.13);
-        box-sizing: border-box;
-    }
-
-    .medication-card h1 {
-        color: #7952b3;
-        font-size: 30px;
-        text-align: center;
-        margin-bottom: 8px;
-    }
-
-    .medication-subtitle {
-        text-align: center;
-        color: #777;
-        margin-bottom: 30px;
-    }
-
-    .medication-card label {
-        display: block;
-        margin: 18px 0 8px;
-        font-weight: bold;
-        color: #40364f;
-    }
-
-    .medication-card input,
-    .medication-card select,
-    .medication-card textarea {
-        width: 100%;
-        padding: 13px;
-        border: 1px solid #d8caef;
-        border-radius: 10px;
-        background: white;
-        font: inherit;
-        box-sizing: border-box;
-    }
-
-    .medication-card input:focus,
-    .medication-card select:focus,
-    .medication-card textarea:focus {
-        outline: none;
-        border-color: #8059c8;
-        box-shadow: 0 0 0 3px rgba(128, 89, 200, 0.12);
-    }
-
-    .medication-button {
-        width: 100%;
-        margin-top: 28px;
-        padding: 15px;
-        border: none;
-        border-radius: 10px;
-        background: #8059c8;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .medication-button:hover {
-        background: #6944b0;
+    /* Hide old COVID sidebar */
+    #sidebar {
+        display: none;
     }
 
     #container:has(.medication-page) {
@@ -86,102 +19,574 @@
         width: 100%;
     }
 
+    /* Page */
+    .medication-page {
+        min-height: 85vh;
+
+        padding: 50px 20px;
+
+        background: linear-gradient(
+            135deg,
+            #f8f5ff,
+            #eee6ff
+        );
+
+        font-family: Arial, sans-serif;
+
+        box-sizing: border-box;
+    }
+
+    /* Card */
+    .medication-card {
+        max-width: 600px;
+
+        margin: 0 auto;
+
+        padding: 40px;
+
+        background: white;
+
+        border-radius: 22px;
+
+        box-shadow:
+            0 12px 40px
+            rgba(104, 73, 155, 0.13);
+
+        box-sizing: border-box;
+    }
+
+    /* Title */
+    .medication-card h1 {
+        color: #7952b3;
+
+        font-size: 30px;
+
+        text-align: center;
+
+        margin-bottom: 8px;
+    }
+
+    .medication-subtitle {
+        text-align: center;
+
+        color: #777;
+
+        margin-bottom: 30px;
+    }
+
+    /* ===============================================
+       SUCCESS MESSAGE
+       =============================================== */
+
+    .success-message {
+        background: #eaf7ee;
+
+        color: #25663b;
+
+        padding: 22px;
+
+        border: 1px solid #ccebd5;
+
+        border-radius: 14px;
+
+        margin-bottom: 28px;
+
+        text-align: center;
+    }
+
+    .success-icon {
+        width: 46px;
+        height: 46px;
+
+        margin: 0 auto 10px;
+
+        border-radius: 50%;
+
+        background: #45a564;
+
+        color: white;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 27px;
+
+        font-weight: bold;
+    }
+
+    .success-message > strong {
+        display: block;
+
+        font-size: 18px;
+
+        margin-bottom: 12px;
+    }
+
+    .success-message > small {
+        color: #568565;
+    }
+
+    /* Saved summary */
+    .saved-summary {
+        margin: 18px 0;
+
+        padding: 16px 18px;
+
+        background: white;
+
+        border-radius: 10px;
+
+        text-align: left;
+
+        color: #40364f;
+    }
+
+    .saved-row {
+        display: flex;
+
+        justify-content: space-between;
+
+        gap: 20px;
+
+        padding: 8px 0;
+
+        border-bottom: 1px solid #edf3ef;
+    }
+
+    .saved-row:last-child {
+        border-bottom: none;
+    }
+
+    .saved-label {
+        font-weight: bold;
+
+        color: #35774a;
+    }
+
+    .saved-value {
+        text-align: right;
+
+        color: #40364f;
+
+        word-break: break-word;
+    }
+
+    /* ===============================================
+       FORM
+       =============================================== */
+
+    .medication-card label {
+        display: block;
+
+        margin: 18px 0 8px;
+
+        font-weight: bold;
+
+        color: #40364f;
+    }
+
+    .medication-card input,
+    .medication-card select,
+    .medication-card textarea {
+        width: 100%;
+
+        padding: 13px;
+
+        border: 1px solid #d8caef;
+
+        border-radius: 10px;
+
+        background: white;
+
+        font: inherit;
+
+        box-sizing: border-box;
+    }
+
+    .medication-card input:focus,
+    .medication-card select:focus,
+    .medication-card textarea:focus {
+        outline: none;
+
+        border-color: #8059c8;
+
+        box-shadow:
+            0 0 0 3px
+            rgba(128, 89, 200, 0.12);
+    }
+
+    .medication-card textarea {
+        resize: vertical;
+    }
+
+    /* Button */
+    .medication-button {
+        width: 100%;
+
+        margin-top: 28px;
+
+        padding: 15px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        background: #8059c8;
+
+        color: white;
+
+        font-weight: bold;
+
+        cursor: pointer;
+    }
+
+    .medication-button:hover {
+        background: #6944b0;
+    }
+
+    /* Flatpickr */
+    .flatpickr-calendar {
+        font-family: Arial, sans-serif;
+
+        border-radius: 14px;
+
+        box-shadow:
+            0 12px 30px
+            rgba(104, 73, 155, 0.16);
+    }
+
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover {
+        background: #8059c8;
+
+        border-color: #8059c8;
+    }
+
+    /* Mobile */
     @media (max-width: 600px) {
+
+        .medication-page {
+            padding: 24px 12px;
+        }
+
         .medication-card {
             padding: 25px 20px;
         }
+
+        .saved-row {
+            flex-direction: column;
+
+            gap: 4px;
+        }
+
+        .saved-value {
+            text-align: left;
+        }
     }
+
 </style>
+
 
 <main class="medication-page">
 
     <div class="medication-card">
 
-        <h1>💊 Medication Tracker</h1>
+
+        <!-- =========================================
+             SUCCESS MESSAGE
+             ========================================= -->
+
+        {% if success %}
+
+        <div class="success-message">
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+            <strong>
+                Medication information saved successfully!
+            </strong>
+
+
+            <div class="saved-summary">
+
+
+                <div class="saved-row">
+
+                    <span class="saved-label">
+                        Medication
+                    </span>
+
+                    <span class="saved-value">
+                        {{ medication_data["medicine_name"] }}
+                    </span>
+
+                </div>
+
+
+                <div class="saved-row">
+
+                    <span class="saved-label">
+                        Dose
+                    </span>
+
+                    <span class="saved-value">
+                        {{ medication_data["dose"] }}
+                    </span>
+
+                </div>
+
+
+                <div class="saved-row">
+
+                    <span class="saved-label">
+                        Frequency
+                    </span>
+
+                    <span class="saved-value">
+                        {{ medication_data["frequency"] }}
+                    </span>
+
+                </div>
+
+
+                <div class="saved-row">
+
+                    <span class="saved-label">
+                        Time
+                    </span>
+
+                    <span class="saved-value">
+
+                        {% if medication_data["medication_time"] %}
+
+                            {{ medication_data["medication_time"] }}
+
+                        {% else %}
+
+                            Not specified
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+                <div class="saved-row">
+
+                    <span class="saved-label">
+                        Start Date
+                    </span>
+
+                    <span class="saved-value">
+                        {{ medication_data["start_date"] }}
+                    </span>
+
+                </div>
+
+
+                <div class="saved-row">
+
+                    <span class="saved-label">
+                        Notes
+                    </span>
+
+                    <span class="saved-value">
+
+                        {% if medication_data["notes"] %}
+
+                            {{ medication_data["notes"] }}
+
+                        {% else %}
+
+                            No notes
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <small>
+                Returning to My Appointments in 3 seconds...
+            </small>
+
+        </div>
+
+
+        <script>
+
+            setTimeout(function () {
+
+                window.location.href =
+                    "{{ url_for('my_appointments') }}";
+
+            }, 3000);
+
+        </script>
+
+        {% endif %}
+
+
+        <!-- =========================================
+             TITLE
+             ========================================= -->
+
+        <h1>
+            💊 Medication Tracker
+        </h1>
 
         <p class="medication-subtitle">
             Keep your medication routine organised.
         </p>
 
+
+        <!-- =========================================
+             FORM
+             ========================================= -->
+
         <form method="POST">
+
+
+            <!-- Medication Name -->
 
             <label for="medicine_name">
                 Medication Name
             </label>
+
             <input
                 type="text"
                 id="medicine_name"
                 name="medicine_name"
                 placeholder="e.g. Ibuprofen"
+                value="{{ medication_data['medicine_name'] }}"
                 required
             >
+
+
+            <!-- Dose -->
 
             <label for="dose">
                 Dose
             </label>
+
             <input
                 type="text"
                 id="dose"
                 name="dose"
                 placeholder="e.g. 200 mg"
+                value="{{ medication_data['dose'] }}"
                 required
             >
+
+
+            <!-- Frequency -->
 
             <label for="frequency">
                 How often?
             </label>
+
             <select
                 id="frequency"
                 name="frequency"
                 required
             >
+
                 <option value="">
                     Select frequency
                 </option>
-                <option value="Once daily">
+
+
+                <option
+                    value="Once daily"
+
+                    {% if medication_data["frequency"] == "Once daily" %}
+                        selected
+                    {% endif %}
+                >
                     Once daily
                 </option>
-                <option value="Twice daily">
+
+
+                <option
+                    value="Twice daily"
+
+                    {% if medication_data["frequency"] == "Twice daily" %}
+                        selected
+                    {% endif %}
+                >
                     Twice daily
                 </option>
-                <option value="As needed">
+
+
+                <option
+                    value="As needed"
+
+                    {% if medication_data["frequency"] == "As needed" %}
+                        selected
+                    {% endif %}
+                >
                     As needed
                 </option>
+
             </select>
+
+
+            <!-- Medication Time -->
 
             <label for="medication_time">
                 Time
             </label>
+
             <input
                 type="time"
                 id="medication_time"
                 name="medication_time"
+                value="{{ medication_data['medication_time'] }}"
             >
 
-            
-<label for="start_date">
-    Start Date
-</label>
 
-<input
-    type="text"
-    id="start_date"
-    name="start_date"
-    placeholder="DD/MM/YYYY"
-    autocomplete="off"
-    required
->
+            <!-- Start Date -->
 
+            <label for="start_date">
+                Start Date
+            </label>
+
+            <input
+                type="text"
+                id="start_date"
+                name="start_date"
+                placeholder="DD/MM/YYYY"
+                autocomplete="off"
+                value="{{ medication_data['start_date'] }}"
+                required
+            >
+
+
+            <!-- Notes -->
 
             <label for="notes">
                 Notes
             </label>
+
             <textarea
                 id="notes"
                 name="notes"
                 rows="4"
                 placeholder="e.g. Take after food"
-            ></textarea>
+            >{{ medication_data["notes"] }}</textarea>
+
+
+            <!-- Submit -->
 
             <button
                 type="submit"
@@ -196,16 +601,30 @@
 
 </main>
 
+
+<!-- Flatpickr -->
+
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
-    flatpickr("#start_date", {
-        locale: "en",
-        dateFormat: "Y-m-d",
-        altInput: true,
-        altFormat: "d/m/Y",
-        allowInput: false
-    });
+
+    flatpickr(
+        "#start_date",
+        {
+
+            locale: "en",
+
+            dateFormat: "Y-m-d",
+
+            altInput: true,
+
+            altFormat: "d/m/Y",
+
+            allowInput: false
+
+        }
+    );
+
 </script>
 
 

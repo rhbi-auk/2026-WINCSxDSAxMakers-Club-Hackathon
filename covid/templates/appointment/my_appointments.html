@@ -6,12 +6,6 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
 <style>
-    /* Remove old Editor's Picks */
-    #sidebar {
-        display: none !important;
-    }
-
-    /* Make page full width */
     #container:has(.appointments-page) {
         display: block;
         width: 100%;
@@ -315,413 +309,13 @@
             gap: 10px;
         }
     }
-    }
-
-    #container:has(.appointments-page) .appointments-page {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-
-    /* Main background */
-    .appointments-page {
-        min-height: 85vh;
-
-        padding: 50px 20px;
-
-        background: linear-gradient(
-            135deg,
-            #f8f5ff,
-            #ece4ff
-        );
-
-        font-family: Arial, sans-serif;
-
-        box-sizing: border-box;
-    }
-
-
-    /* Main white card */
-    .appointments-card {
-
-        width: 100%;
-
-        max-width: 950px;
-
-        margin: 0 auto;
-
-        padding: 36px;
-
-        border-radius: 22px;
-
-        background: white;
-
-        box-shadow:
-            0 12px 40px
-            rgba(104, 73, 155, 0.13);
-
-        box-sizing: border-box;
-    }
-
-
-    /* Page title */
-    .appointments-title {
-
-        text-align: center;
-
-        color: #7952b3;
-
-        font-size: 30px;
-
-        margin-bottom: 5px;
-    }
-
-
-    .appointments-subtitle {
-
-        text-align: center;
-
-        color: #777;
-
-        margin-top: 0;
-
-        margin-bottom: 35px;
-    }
-
-
-    /* Calendar container */
-    .calendar-box {
-
-        padding: 20px;
-
-        border: 1px solid #e4d9f6;
-
-        border-radius: 18px;
-
-        background: #fff;
-
-        margin-bottom: 20px;
-    }
-
-
-    /* FullCalendar header */
-    .fc .fc-toolbar-title {
-
-        color: #40364f;
-
-        font-size: 22px;
-
-        font-weight: bold;
-    }
-
-
-    /* Calendar buttons */
-    .fc .fc-button-primary {
-
-        background: #8059c8;
-
-        border-color: #8059c8;
-    }
-
-
-    .fc .fc-button-primary:hover {
-
-        background: #6944b0;
-
-        border-color: #6944b0;
-    }
-
-
-    .fc .fc-button-primary:not(:disabled).fc-button-active {
-
-        background: #6944b0;
-
-        border-color: #6944b0;
-    }
-
-
-    /* Calendar day */
-    .fc .fc-daygrid-day-number {
-
-        color: #40364f;
-
-        text-decoration: none;
-    }
-
-
-    .fc .fc-col-header-cell-cushion {
-
-        color: #40364f;
-
-        text-decoration: none;
-    }
-
-
-    /* Event styling */
-    .fc-event {
-
-        border: none;
-
-        border-radius: 6px;
-
-        padding: 2px 4px;
-
-        font-size: 12px;
-
-        cursor: pointer;
-    }
-
-
-    /* Legend */
-    .calendar-legend {
-
-        display: flex;
-
-        justify-content: center;
-
-        gap: 30px;
-
-        margin: 20px 0 35px;
-
-        color: #555;
-    }
-
-
-    .legend-item {
-
-        display: flex;
-
-        align-items: center;
-
-        gap: 8px;
-    }
-
-
-    .legend-dot {
-
-        width: 12px;
-
-        height: 12px;
-
-        border-radius: 50%;
-    }
-
-
-    .history-dot {
-        background: #aaa;
-    }
-
-
-    .future-dot {
-        background: #8059c8;
-    }
-
-
-    /* Appointment list title */
-    .list-title {
-
-        color: #7952b3;
-
-        text-align: center;
-
-        font-size: 25px;
-
-        margin-top: 30px;
-
-        margin-bottom: 20px;
-    }
-
-
-    /* Appointment cards */
-    .appointment-item {
-
-        border: 1px solid #e0d4f3;
-
-        border-radius: 14px;
-
-        padding: 20px;
-
-        margin-bottom: 16px;
-
-        background: #faf8ff;
-
-        transition:
-            transform 0.15s ease,
-            box-shadow 0.15s ease;
-    }
-
-
-    .appointment-item:hover {
-
-        transform: translateY(-2px);
-
-        box-shadow:
-            0 6px 18px
-            rgba(104, 73, 155, 0.10);
-    }
-
-
-    .appointment-header {
-
-        display: flex;
-
-        justify-content: space-between;
-
-        align-items: center;
-
-        gap: 20px;
-    }
-
-
-    .appointment-name {
-
-        color: #40364f;
-
-        font-size: 19px;
-
-        font-weight: bold;
-
-        margin: 0;
-    }
-
-
-    /* Status badge */
-    .status {
-
-        padding: 6px 12px;
-
-        border-radius: 20px;
-
-        font-size: 12px;
-
-        font-weight: bold;
-
-        white-space: nowrap;
-    }
-
-
-    .status-history {
-
-        background: #eeeeee;
-
-        color: #666;
-    }
-
-
-    .status-future {
-
-        background: #eee6ff;
-
-        color: #6840a5;
-    }
-
-
-    .appointment-date {
-
-        color: #7952b3;
-
-        font-weight: bold;
-
-        margin-top: 12px;
-    }
-
-
-    .appointment-reason {
-
-        color: #666;
-
-        margin-top: 8px;
-    }
-
-
-    /* No appointments */
-    .no-appointments {
-
-        text-align: center;
-
-        padding: 35px;
-
-        color: #777;
-
-        border-radius: 15px;
-
-        background: #faf8ff;
-    }
-
-
-    /* Book button */
-    .book-button {
-
-        display: block;
-
-        width: 220px;
-
-        margin: 30px auto 0;
-
-        padding: 14px;
-
-        border-radius: 10px;
-
-        background: #8059c8;
-
-        color: white;
-
-        font-weight: bold;
-
-        text-align: center;
-
-        text-decoration: none;
-    }
-
-
-    .book-button:hover {
-
-        background: #6944b0;
-    }
-
-
-    @media (max-width: 700px) {
-
-        .appointments-page {
-
-            padding: 24px 12px;
-        }
-
-        .appointments-card {
-
-            padding: 24px 16px;
-        }
-
-        .appointment-header {
-
-            flex-direction: column;
-
-            align-items: flex-start;
-        }
-
-        .calendar-legend {
-
-            flex-direction: column;
-
-            align-items: center;
-
-            gap: 10px;
-        }
-    }
-
 </style>
-
 
 <main class="appointments-page">
 
-    <div class="appointments-card">
+    <div class="appointments-container">
 
-
-        <!-- Page title -->
-
-        <h1 class="appointments-title">
-            My Appointments
-        </h1>
+        <h1>My Appointments</h1>
 
         <p class="appointments-subtitle">
             View your appointment history and upcoming visits.
@@ -759,36 +353,35 @@
 
         {% for appointment in appointments %}
 
+        <div class="appointment-card">
 
-        <!-- Calendar -->
+            <h2>
+                {{ appointment["appointment_type"] }}
+            </h2>
 
-        <div class="calendar-box">
-            <div id="appointment-calendar"></div>
-        </div>
+            <span class="status-badge status-{{ appointment['status'] | lower }}">
+                {{ appointment["status"] }}
+            </span>
 
-        <span class="status-badge status-{{ appointment['status'] | lower }}">
-            {{ appointment["status"] }}
-        </span>
+            <p>
+                <strong>Doctor:</strong>
+                {{ appointment["doctor_name"] }}
+            </p>
 
-        <p>
-            <strong>Doctor:</strong>
-            {{ appointment["doctor_name"] }}
-        </p>
+            <p>
+                <strong>Date:</strong>
+                {{ appointment["appointment_date"] }}
+            </p>
 
-        <p>
-            <strong>Date:</strong>
-            {{ appointment["appointment_date"] }}
-        </p>
+            <p>
+                <strong>Time:</strong>
+                {{ appointment["appointment_time"] }}
+            </p>
 
-        <p>
-            <strong>Time:</strong>
-            {{ appointment["appointment_time"] }}
-        </p>
-
-        <p>
-            <strong>Reason:</strong>
-            {{ appointment["reason"] or "Not provided" }}
-        </p>
+            <p>
+                <strong>Reason:</strong>
+                {{ appointment["reason"] or "Not provided" }}
+            </p>
 
             <div class="appointment-actions">
                 <a class="prep-link"
@@ -803,143 +396,18 @@
 
         </div>
 
-
-
-        <!-- Legend -->
-
-        <div class="calendar-legend">
-
-            <div class="legend-item">
-
-                <span
-                    class="legend-dot history-dot">
-                </span>
-
-                History Appointment
-
-            </div>
-
-
-            <div class="legend-item">
-
-                <span
-                    class="legend-dot future-dot">
-                </span>
-
-                Future Appointment
-
-            </div>
-
-        </div>
-
-
-
-        <!-- Appointment list -->
-
-        <h2 class="list-title">
-            Appointment List
-        </h2>
-
-
-        {% if appointments %}
-
-
-            {% for appointment in appointments %}
-
-
-                <div
-                    class="appointment-item"
-                    data-date="{{ appointment['appointment_date'] }}"
-                >
-
-
-                    <div class="appointment-header">
-
-
-                        <h3 class="appointment-name">
-
-                            {{ appointment['appointment_type'] }}
-
-                        </h3>
-
-
-                        <!-- Status will be filled by JavaScript -->
-
-                        <span
-                            class="status appointment-status">
-                        </span>
-
-
-                    </div>
-
-
-
-                    <div class="appointment-date">
-
-                        {{ appointment['appointment_date'] }}
-
-                        {% if appointment['appointment_time'] %}
-
-                            · {{ appointment['appointment_time'] }}
-
-                        {% endif %}
-
-                    </div>
-
-
-
-                    {% if appointment['reason'] %}
-
-                        <div class="appointment-reason">
-
-                            {{ appointment['reason'] }}
-
-                        </div>
-
-                    {% endif %}
-
-
-                </div>
-
-
-            {% endfor %}
-
-
         {% else %}
 
         <div class="appointment-card">
             <p>No appointments found.</p>
         </div>
 
-            <div class="no-appointments">
-
-                No appointments found.
-
-            </div>
-
-
-        {% endif %}
-
-
-
-        <!-- Book appointment -->
-
-        <a
-            class="book-button"
-            href="{{ url_for('book_appointment') }}"
-        >
-
-        <a class="prep-link"
-           href="{{ url_for('book_appointment') }}">
-            + Book Another Appointment
-        </a>
+        {% endfor %}
 
         <a class="log-link"
            href="{{ url_for('log_appointment') }}">
             + Log Appointment
         </a>
-        </a>
-
 
     </div>
 
@@ -1026,20 +494,7 @@
 
         calendar.render();
 
-        document.querySelectorAll(".appointment-item").forEach(function (item) {
-            const dateString = item.dataset.date;
-            const appointmentDate = new Date(dateString + "T00:00:00");
-            const statusElement = item.querySelector(".appointment-status");
-
-            if (appointmentDate < today) {
-                statusElement.textContent = "History Appointment";
-                statusElement.classList.add("status-history");
-            } else {
-                statusElement.textContent = "Future Appointment";
-                statusElement.classList.add("status-future");
-            }
-        });
-
+        // Delete confirmation dialog wiring
         const deleteConfirmation = document.querySelector('#delete-confirmation');
         const appointmentsContainer = document.querySelector('.appointments-container');
         let pendingDeleteForm = null;
@@ -1074,4 +529,5 @@
 
     });
 </script>
+
 {% endblock %}
