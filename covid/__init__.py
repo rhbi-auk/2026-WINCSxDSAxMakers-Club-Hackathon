@@ -1,11 +1,10 @@
-
 """Initialise Flask app."""
 
 from pathlib import Path
 from datetime import date, time
 import sqlite3
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 
 import covid.adapters.repository as repo
 from covid.adapters.memory_repository import MemoryRepository, populate
@@ -53,6 +52,12 @@ def create_app(test_config=None):
             utilities.utilities_blueprint
         )
 
+        from .doctor_visit_prep import doctor_visit_prep
+
+        app.register_blueprint(
+            doctor_visit_prep.doctor_visit_prep_blueprint
+        )
+
         # --------------------------------
         # Appointment database
         # --------------------------------
@@ -70,7 +75,7 @@ def create_app(test_config=None):
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS appointments (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    patient_name TEXT NOT NULL,
+                    doctor_name TEXT NOT NULL,
                     appointment_type TEXT NOT NULL,
                     appointment_date TEXT NOT NULL,
                     appointment_time TEXT NOT NULL,
@@ -79,26 +84,35 @@ def create_app(test_config=None):
                 )
             """)
 
+            columns = {
+                row[1]
+                for row in conn.execute("PRAGMA table_info(appointments)")
+            }
+            if "patient_name" in columns and "doctor_name" not in columns:
+                conn.execute(
+                    "ALTER TABLE appointments RENAME COLUMN patient_name TO doctor_name"
+                )
+
         # --------------------------------
-        # Book appointment
+        # Log appointment
         # --------------------------------
 
         @app.route(
-            "/appointment/book",
+            "/appointment/log",
             methods=["GET", "POST"]
         )
-        def book_appointment():
+        def log_appointment():
 
-            # Display booking page
+            # Display log-entry page
             if request.method == "GET":
 
                 return render_template(
-                    "appointment/book.html"
+                    "appointment/log.html"
                 )
 
             # Get submitted form data
-            patient_name = request.form.get(
-                "patient_name", ""
+            doctor_name = request.form.get(
+                "doctor_name", ""
             ).strip()
 
             appointment_type = request.form.get(
@@ -119,7 +133,7 @@ def create_app(test_config=None):
 
             # Check required fields
             if not all([
-                patient_name,
+                doctor_name,
                 appointment_type,
                 appointment_date,
                 appointment_time
@@ -146,6 +160,9 @@ def create_app(test_config=None):
                 )
 
             # Validate date and time
+            # Note: no "must be today or later" restriction here, since a
+            # log entry can record a past appointment as well as an
+            # upcoming one.
             try:
 
                 selected_date = date.fromisoformat(
@@ -155,13 +172,6 @@ def create_app(test_config=None):
                 selected_time = time.fromisoformat(
                     appointment_time
                 )
-
-                if selected_date < date.today():
-
-                    return (
-                        "Please select today or a future date.",
-                        400
-                    )
 
             except ValueError:
 
@@ -176,7 +186,7 @@ def create_app(test_config=None):
                 conn.execute(
                     """
                     INSERT INTO appointments (
-                        patient_name,
+                        doctor_name,
                         appointment_type,
                         appointment_date,
                         appointment_time,
@@ -185,7 +195,7 @@ def create_app(test_config=None):
                     VALUES (?, ?, ?, ?, ?)
                     """,
                     (
-                        patient_name,
+                        doctor_name,
                         appointment_type,
                         selected_date.isoformat(),
                         selected_time.isoformat(
@@ -197,27 +207,37 @@ def create_app(test_config=None):
 
             # Show success message
             return render_template(
-                "appointment/book.html",
+                "appointment/log.html",
                 success=True
             )
 
         # My Appointments page
         @app.route("/appointment/my")
         def my_appointments():
+            sort_by = request.args.get("sort", "date")
+            sort_orders = {
+                "date": "appointment_date DESC, appointment_time DESC",
+                "date_oldest": "appointment_date ASC, appointment_time ASC",
+                "doctor": "doctor_name COLLATE NOCASE ASC, appointment_date DESC, appointment_time DESC"
+            }
+            if sort_by not in sort_orders:
+                sort_by = "date"
 
             with sqlite3.connect(db_path) as conn:
                 conn.row_factory = sqlite3.Row
 
-                appointments = conn.execute("""
+                appointments = conn.execute(f"""
                     SELECT *
                     FROM appointments
-                    ORDER BY appointment_date DESC
+                    ORDER BY {sort_orders[sort_by]}
                 """).fetchall()
 
             return render_template(
                 "appointment/my_appointments.html",
-                appointments=appointments
+                appointments=appointments,
+                sort_by=sort_by
             )
+
 
         # Medication Tracker
         @app.route("/medication/tracker", methods=["GET"])
@@ -226,5 +246,19 @@ def create_app(test_config=None):
                 "medication/tracker.html"
             )
 
-    return app
+        # Delete appointment
+        @app.route(
+            "/appointment/<int:appointment_id>/delete",
+            methods=["POST"]
+        )
+        def delete_appointment(appointment_id):
 
+            with sqlite3.connect(db_path) as conn:
+                conn.execute(
+                    "DELETE FROM appointments WHERE id = ?",
+                    (appointment_id,)
+                )
+
+            return redirect(url_for("my_appointments"))
+
+    return app
