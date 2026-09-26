@@ -1,4 +1,3 @@
-
 {% extends 'layout.html' %}
 
 {% block content %}
@@ -10,8 +9,8 @@
 >
 
 <style>
-    /* Appointment page */
-    .booking-page {
+    /* Appointment log page */
+    .log-appointment-page {
         min-height: 85vh;
         padding: 50px 20px;
         background: linear-gradient(
@@ -24,7 +23,7 @@
     }
 
     /* White appointment card */
-    .booking-card {
+    .log-appointment-card {
         width: 100%;
         max-width: 650px;
         margin: 0 auto;
@@ -37,21 +36,21 @@
     }
 
     /* Title */
-    .booking-card h1 {
+    .log-appointment-card h1 {
         color: #7952b3;
         text-align: center;
         font-size: 30px;
         margin-bottom: 5px;
     }
 
-    .booking-card p {
+    .log-appointment-card p {
         color: #777;
         text-align: center;
         margin-bottom: 30px;
     }
 
     /* Form labels */
-    .booking-card label {
+    .log-appointment-card label {
         display: block;
         margin: 18px 0 7px;
         font-weight: bold;
@@ -59,9 +58,9 @@
     }
 
     /* Form fields */
-    .booking-card input,
-    .booking-card select,
-    .booking-card textarea {
+    .log-appointment-card input,
+    .log-appointment-card select,
+    .log-appointment-card textarea {
         box-sizing: border-box;
         width: 100%;
         padding: 13px;
@@ -71,9 +70,9 @@
         font: inherit;
     }
 
-    .booking-card input:focus,
-    .booking-card select:focus,
-    .booking-card textarea:focus {
+    .log-appointment-card input:focus,
+    .log-appointment-card select:focus,
+    .log-appointment-card textarea:focus {
         outline: none;
         border-color: #8059c8;
         box-shadow: 0 0 0 3px
@@ -81,7 +80,7 @@
     }
 
     /* Save button */
-    .booking-card button {
+    .log-appointment-card button {
         width: 100%;
         margin-top: 24px;
         padding: 14px;
@@ -93,17 +92,17 @@
         cursor: pointer;
     }
 
-    .booking-card button:hover {
+    .log-appointment-card button:hover {
         background: #6944b0;
     }
 
     /* Expand appointment content */
-    #container:has(.booking-page) {
+    #container:has(.log-appointment-page) {
         display: block;
         width: 100%;
     }
 
-    #container:has(.booking-page) .booking-page {
+    #container:has(.log-appointment-page) .log-appointment-page {
         width: 100%;
         box-sizing: border-box;
     }
@@ -123,18 +122,18 @@
     }
 
     @media (max-width: 600px) {
-        .booking-page {
+        .log-appointment-page {
             padding: 24px 12px;
         }
 
-        .booking-card {
+        .log-appointment-card {
             padding: 25px 20px;
         }
     }
 </style>
 
-<main class="booking-page">
-    <div class="booking-card">
+<main class="log-appointment-page">
+    <div class="log-appointment-card">
 
         
 {% if success %}
@@ -147,35 +146,35 @@
     text-align: center;
 ">
     <strong>
-        Appointment request saved successfully!
+        Appointment logged successfully!
     </strong>
 
-    <p>Status: Pending</p>
+    <p>Saved to your records.</p>
 
     <small>
-        Your request has been saved locally.
-        This is not a confirmed medical booking.
+        This entry is stored in your personal appointment log only.
+        It does not book, request, or confirm anything with a healthcare provider.
     </small>
 </div>
 {% endif %}
-<h1>Book an Appointment</h1>
+<h1>Log an Appointment</h1>
 
         <p>
-            Prepare for your next doctor visit.
+            Keep a record of an upcoming or past doctor visit.
         </p>
 
         <form method="POST">
 
-            <!-- Patient name -->
-            <label for="patient_name">
-                Patient name
+            <!-- Doctor name -->
+            <label for="doctor_name">
+                Doctor name
             </label>
 
             <input
                 type="text"
-                id="patient_name"
-                name="patient_name"
-                placeholder="Enter your full name"
+                id="doctor_name"
+                name="doctor_name"
+                placeholder="Enter the doctor's name"
                 required
             >
 
@@ -212,7 +211,7 @@
 
             <!-- English date picker -->
             <label for="appointment_date">
-                Preferred date
+                Appointment date
             </label>
 
             <input
@@ -224,9 +223,9 @@
                 required
             >
 
-            <!-- Preferred time -->
+            <!-- Time -->
             <label for="appointment_time">
-                Preferred time
+                Appointment time
             </label>
 
             <input
@@ -245,25 +244,15 @@
                 id="reason"
                 name="reason"
                 rows="4"
-                placeholder="What would you like to discuss?"
+                placeholder="What is/was this appointment about?"
             ></textarea>
 
             <!-- Submit -->
             <button type="submit">
-                Save Appointment Request
+                Log Appointment
             </button>
 
         </form>
-
-        <p style="
-            margin-top: 22px;
-            font-size: 12px;
-            color: #888;
-        ">
-            This is an appointment request,
-            not a confirmed medical booking.
-        </p>
-
     </div>
 </main>
 
@@ -276,7 +265,7 @@
         dateFormat: "Y-m-d",
         altInput: true,
         altFormat: "m/d/Y",
-        minDate: "today",
+        minDate: null,
         allowInput: false
     });
 </script>

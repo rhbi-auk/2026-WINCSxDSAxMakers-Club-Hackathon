@@ -1,0 +1,212 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+>
+<style>
+    .medication-page {
+        min-height: 85vh;
+        padding: 50px 20px;
+        background: linear-gradient(135deg, #f8f5ff, #eee6ff);
+        font-family: Arial, sans-serif;
+        box-sizing: border-box;
+    }
+
+    .medication-card {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px;
+        background: white;
+        border-radius: 22px;
+        box-shadow: 0 12px 40px rgba(104, 73, 155, 0.13);
+        box-sizing: border-box;
+    }
+
+    .medication-card h1 {
+        color: #7952b3;
+        font-size: 30px;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+
+    .medication-subtitle {
+        text-align: center;
+        color: #777;
+        margin-bottom: 30px;
+    }
+
+    .medication-card label {
+        display: block;
+        margin: 18px 0 8px;
+        font-weight: bold;
+        color: #40364f;
+    }
+
+    .medication-card input,
+    .medication-card select,
+    .medication-card textarea {
+        width: 100%;
+        padding: 13px;
+        border: 1px solid #d8caef;
+        border-radius: 10px;
+        background: white;
+        font: inherit;
+        box-sizing: border-box;
+    }
+
+    .medication-card input:focus,
+    .medication-card select:focus,
+    .medication-card textarea:focus {
+        outline: none;
+        border-color: #8059c8;
+        box-shadow: 0 0 0 3px rgba(128, 89, 200, 0.12);
+    }
+
+    .medication-button {
+        width: 100%;
+        margin-top: 28px;
+        padding: 15px;
+        border: none;
+        border-radius: 10px;
+        background: #8059c8;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .medication-button:hover {
+        background: #6944b0;
+    }
+
+    #container:has(.medication-page) {
+        display: block;
+        width: 100%;
+    }
+
+    @media (max-width: 600px) {
+        .medication-card {
+            padding: 25px 20px;
+        }
+    }
+</style>
+
+<main class="medication-page">
+
+    <div class="medication-card">
+
+        <h1>💊 Medication Tracker</h1>
+
+        <p class="medication-subtitle">
+            Keep your medication routine organised.
+        </p>
+
+        <form method="POST">
+
+            <label for="medicine_name">
+                Medication Name
+            </label>
+            <input
+                type="text"
+                id="medicine_name"
+                name="medicine_name"
+                placeholder="e.g. Ibuprofen"
+                required
+            >
+
+            <label for="dose">
+                Dose
+            </label>
+            <input
+                type="text"
+                id="dose"
+                name="dose"
+                placeholder="e.g. 200 mg"
+                required
+            >
+
+            <label for="frequency">
+                How often?
+            </label>
+            <select
+                id="frequency"
+                name="frequency"
+                required
+            >
+                <option value="">
+                    Select frequency
+                </option>
+                <option value="Once daily">
+                    Once daily
+                </option>
+                <option value="Twice daily">
+                    Twice daily
+                </option>
+                <option value="As needed">
+                    As needed
+                </option>
+            </select>
+
+            <label for="medication_time">
+                Time
+            </label>
+            <input
+                type="time"
+                id="medication_time"
+                name="medication_time"
+            >
+
+            
+<label for="start_date">
+    Start Date
+</label>
+
+<input
+    type="text"
+    id="start_date"
+    name="start_date"
+    placeholder="DD/MM/YYYY"
+    autocomplete="off"
+    required
+>
+
+
+            <label for="notes">
+                Notes
+            </label>
+            <textarea
+                id="notes"
+                name="notes"
+                rows="4"
+                placeholder="e.g. Take after food"
+            ></textarea>
+
+            <button
+                type="submit"
+                class="medication-button"
+            >
+                Add Medication
+            </button>
+
+        </form>
+
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    flatpickr("#start_date", {
+        locale: "en",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        allowInput: false
+    });
+</script>
+
+
+{% endblock %}

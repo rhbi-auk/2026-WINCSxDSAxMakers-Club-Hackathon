@@ -1,46 +1,100 @@
-{% extends 'layout.html' %} {% block content %}
-<main id="main">
-  <p>
-    The COVID‑19 pandemic, also known as the coronavirus pandemic, is an ongoing
-    global pandemic of coronavirus disease 2019 (COVID‑19), caused by severe
-    acute respiratory syndrome coronavirus 2 (SARS‑CoV‑2). The outbreak was
-    first identified in Wuhan, China, in December 2019. The World Health
-    Organization declared the outbreak a Public Health Emergency of
-    International Concern on 30 January 2020 and a pandemic on 11 March. As of
-    23 July 2020, more than 15.2 million cases of COVID‑19 have been reported in
-    more than 188 countries and territories, resulting in more than 623,000
-    deaths; more than 8.64 million people have recovered.
-  </p>
-  <br />
-  <p>
-    The virus is primarily spread between people during close contact, most
-    often via small droplets produced by coughing, sneezing, and talking. The
-    droplets usually fall to the ground or onto surfaces rather than travelling
-    through air over long distances. Transmission may also occur through smaller
-    droplets that are able to stay suspended in the air for longer periods of
-    time. Less commonly, people may become infected by touching a contaminated
-    surface and then touching their face. It is most contagious during the first
-    three days after the onset of symptoms, although spread is possible before
-    symptoms appear, and from people who do not show symptoms.
-  </p>
-  <br />
+{% extends 'layout.html' %}
 
-  <p>
-    The pandemic has caused global social and economic disruption,including the
-    largest global recession since the Great Depression and global famines
-    affecting 265 million people. It has led to the postponement or cancellation
-    of sporting, religious, political, and cultural events, widespread supply
-    shortages exacerbated by panic buying, and decreased emissions of pollutants
-    and greenhouse gases. Schools, universities, and colleges have been closed
-    either on a nationwide or local basis in 172 countries, affecting
-    approximately 98.5 percent of the world's student population. Misinformation
-    about the virus has circulated through social media and mass media. There
-    have been incidents of xenophobia and discrimination against Chinese people
-    and against those perceived as being Chinese or as being from areas with
-    high infection rates.
-  </p>
-  <p style="text-align: right; font-style: italic;">
-    Wikipedia
-  </p>
+{% block content %}
+<main id="main" class="health-home">
+  <style>
+    #container:has(.health-home) { display: block; width: 100%; }
+    #container:has(.health-home) #main { width: 100%; margin: 0; }
+    .health-home {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      padding: 50px 20px;
+      background: linear-gradient(135deg, #f8f5ff, #ece4ff);
+      color: #40364f;
+      font-family: Arial, sans-serif;
+      box-sizing: border-box;
+    }
+    .health-home .home-card {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 36px;
+      border-radius: 22px;
+      background: #fff;
+      box-shadow: 0 12px 40px rgba(104, 73, 155, 0.13);
+      box-sizing: border-box;
+    }
+    .health-home .home-welcome { margin-bottom: 28px; text-align: center; }
+    .health-home .home-eyebrow { margin-bottom: 8px; color: #8059c8; font-size: 11px; font-weight: bold; letter-spacing: 1px; }
+    .health-home h1 { margin-bottom: 8px; color: #7952b3; text-align: center; font-size: 30px; }
+    .health-home .home-intro { margin: 0; color: #777; text-align: center; }
+    .health-home .home-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 24px; }
+    .health-home .home-action { display: flex; min-height: 145px; align-items: flex-start; gap: 14px; padding: 20px; border: 1px solid #d8caef; border-radius: 10px; color: #40364f; background: #fff; transition: background-color .15s ease, box-shadow .15s ease; }
+    .health-home .home-action:hover { background: #f8f5ff; box-shadow: 0 5px 18px rgba(104, 73, 155, 0.1); }
+    .health-home .home-action:focus-visible { outline: 3px solid #8059c8; outline-offset: 3px; }
+    .health-home .home-action .material-icons { color: #8059c8; font-size: 26px; }
+    .health-home .home-action h2 { margin: 0 0 8px; color: #40364f; font-size: 18px; }
+    .health-home .home-action p { margin-bottom: 12px; color: #777; font-size: 13px; line-height: 1.5; }
+    .health-home .home-action strong { color: #7952b3; }
+    .health-home .home-note { padding: 18px; border-radius: 10px; color: #40364f; background: #f8f5ff; text-align: center; }
+    .health-home .home-note h2 { margin-bottom: 8px; color: #7952b3; font-size: 18px; }
+    .health-home .home-note p { margin: 0; color: #777; }
+    .health-home .home-note a { color: #7952b3; font-weight: bold; text-decoration: underline; }
+    @media (max-width: 600px) {
+      .health-home { padding: 24px 12px; }
+      .health-home .home-card { padding: 25px 20px; border-radius: 16px; }
+      .health-home h1 { font-size: 26px; }
+      .health-home .home-actions { grid-template-columns: 1fr; gap: 10px; }
+      .health-home .home-action { min-height: 120px; padding: 17px; }
+    }
+  </style>
+
+  <div class="home-card">
+    <section class="home-welcome">
+      <p class="home-eyebrow">HEALTH COMPANION</p>
+      {% if session.get('user_name') %}
+        <h1>Welcome back, {{ session.get('user_name') }}.</h1>
+        <p class="home-intro">Keep your care plan moving.</p>
+      {% else %}
+        <h1>Your care, made easier.</h1>
+        <p class="home-intro">Sign in to manage appointments and keep important visit details close at hand.</p>
+      {% endif %}
+    </section>
+
+    <section class="home-actions" aria-label="Appointment actions">
+      <a class="home-action" href="{{ url_for('log_appointment') }}">
+        <span class="material-icons" aria-hidden="true">event_available</span>
+        <div>
+          <h2>Log an appointment</h2>
+          <p>Arrange a visit with your care provider.</p>
+          <strong>Log a visit</strong>
+        </div>
+      </a>
+      <a class="home-action" href="{{ url_for('my_appointments') }}">
+        <span class="material-icons" aria-hidden="true">calendar_month</span>
+        <div>
+          <h2>My appointments</h2>
+          <p>Review visit dates and follow-up plans.</p>
+          <strong>View appointments</strong>
+        </div>
+      </a>
+    </section>
+
+    {% if session.get('user_name') %}
+    <section class="home-note">
+      <h2>A helpful reminder</h2>
+      <p>Keep your appointment time, clinic location, and any questions for your provider together before your visit.</p>
+    </section>
+    {% else %}
+    <section class="home-note">
+      <h2>Get started</h2>
+      <p><a href="{{ url_for('authentication_bp.login') }}">Sign in</a> to access your account, or <a href="{{ url_for('authentication_bp.register') }}">create an account</a> to get started.</p>
+    </section>
+    {% endif %}
+  </div>
 </main>
 {% endblock %}

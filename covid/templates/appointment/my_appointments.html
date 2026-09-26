@@ -6,7 +6,6 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
 <style>
-
     /* Remove old Editor's Picks */
     #sidebar {
         display: none !important;
@@ -16,6 +15,306 @@
     #container:has(.appointments-page) {
         display: block;
         width: 100%;
+    }
+
+    .appointments-page {
+        width: 100%;
+        min-height: 100vh;
+        padding: 50px 24px;
+        background: #f5f0ff;
+        font-family: Arial, sans-serif;
+        box-sizing: border-box;
+    }
+
+    .appointments-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .appointments-container h1 {
+        color: #7952b3;
+        text-align: center;
+    }
+
+    .appointments-subtitle {
+        text-align: center;
+        color: #777;
+        margin-top: 0;
+        margin-bottom: 30px;
+    }
+
+    /* ---- Calendar section ---- */
+
+    .calendar-box {
+        padding: 20px;
+        border: 1px solid #e4d9f6;
+        border-radius: 18px;
+        background: #fff;
+        margin-bottom: 20px;
+    }
+
+    .fc .fc-toolbar-title {
+        color: #40364f;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .fc .fc-button-primary {
+        background: #8059c8;
+        border-color: #8059c8;
+    }
+
+    .fc .fc-button-primary:hover {
+        background: #6944b0;
+        border-color: #6944b0;
+    }
+
+    .fc .fc-button-primary:not(:disabled).fc-button-active {
+        background: #6944b0;
+        border-color: #6944b0;
+    }
+
+    .fc .fc-daygrid-day-number,
+    .fc .fc-col-header-cell-cushion {
+        color: #40364f;
+        text-decoration: none;
+    }
+
+    .fc-event {
+        border: none;
+        border-radius: 6px;
+        padding: 2px 4px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .calendar-legend {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin: 20px 0 35px;
+        color: #555;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    .history-dot {
+        background: #aaa;
+    }
+
+    .future-dot {
+        background: #8059c8;
+    }
+
+    .list-title {
+        color: #7952b3;
+        text-align: center;
+        font-size: 25px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+
+    /* ---- List section ---- */
+
+    .appointment-card {
+        margin: 20px 0;
+        padding: 25px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(104, 73, 155, 0.1);
+    }
+
+    .appointment-card h2 {
+        color: #64439b;
+    }
+
+    .appointment-card p {
+        margin: 12px 0;
+        color: #40364f;
+    }
+
+    .sort-controls {
+        display: flex;
+        align-items: end;
+        gap: 10px;
+        margin: 22px 0;
+    }
+
+    .sort-controls label {
+        display: grid;
+        gap: 6px;
+        color: #40364f;
+        font-weight: bold;
+    }
+
+    .sort-controls select {
+        min-height: 42px;
+        padding: 9px 12px;
+        border: 1px solid #d8caef;
+        border-radius: 8px;
+        color: #40364f;
+        background: white;
+        font: inherit;
+    }
+
+    .sort-controls button {
+        min-height: 42px;
+        padding: 9px 15px;
+        border: 0;
+        border-radius: 8px;
+        color: white;
+        background: #8059c8;
+        font: inherit;
+        cursor: pointer;
+    }
+
+    .sort-controls button:hover {
+        background: #6944b0;
+    }
+
+    .appointment-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .prep-link,
+    .delete-button {
+        display: inline-block;
+        padding: 10px 16px;
+        border: 1px solid #8059c8;
+        border-radius: 8px;
+        color: #7952b3;
+        background: white;
+        font: inherit;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .prep-link:hover,
+    .delete-button:hover {
+        color: white;
+        background: #8059c8;
+    }
+
+    .delete-confirmation {
+        width: min(380px, calc(100% - 32px));
+        margin: auto;
+        padding: 26px;
+        border: 0;
+        border-radius: 16px;
+        color: #40364f;
+        background: white;
+        box-shadow: 0 12px 40px rgba(104, 73, 155, 0.2);
+        font-family: Arial, sans-serif;
+        animation: confirmation-pop .16s ease-out;
+    }
+
+    .delete-confirmation::backdrop {
+        background: rgba(49, 39, 66, 0.32);
+    }
+
+    .delete-confirmation h2 {
+        margin: 0 0 8px;
+        color: #64439b;
+        font-size: 20px;
+    }
+
+    .delete-confirmation p {
+        margin: 0;
+        color: #6d6477;
+        line-height: 1.5;
+    }
+
+    .confirmation-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 22px;
+    }
+
+    .confirmation-actions button {
+        padding: 10px 14px;
+        border: 1px solid #8059c8;
+        border-radius: 8px;
+        font: inherit;
+        cursor: pointer;
+    }
+
+    .keep-appointment {
+        color: #7952b3;
+        background: white;
+    }
+
+    .confirm-delete {
+        color: white;
+        background: #8059c8;
+    }
+
+    @keyframes confirmation-pop {
+        from { opacity: 0; transform: translateY(6px) scale(.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .delete-confirmation { animation: none; }
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 7px 13px;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+
+    .status-pending {
+        background: #fff0c2;
+        color: #856300;
+    }
+
+    .status-completed {
+        background: #dff3e3;
+        color: #256a3c;
+    }
+
+    .status-missed {
+        background: #fbe0e0;
+        color: #a13333;
+    }
+
+    .log-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 13px 22px;
+        border-radius: 10px;
+        background: #8059c8;
+        color: white;
+        text-decoration: none;
+    }
+
+    @media (max-width: 700px) {
+        .appointments-page {
+            padding: 24px 12px;
+        }
+
+        .calendar-legend {
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+    }
     }
 
     #container:has(.appointments-page) .appointments-page {
@@ -424,18 +723,83 @@
             My Appointments
         </h1>
 
-
         <p class="appointments-subtitle">
             View your appointment history and upcoming visits.
         </p>
 
+        <!-- Calendar -->
+        <div class="calendar-box">
+            <div id="appointment-calendar"></div>
+        </div>
+
+        <div class="calendar-legend">
+            <div class="legend-item">
+                <span class="legend-dot history-dot"></span>
+                History Appointment
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot future-dot"></span>
+                Future Appointment
+            </div>
+        </div>
+
+        <!-- List -->
+        <h2 class="list-title">Appointment List</h2>
+
+        <form class="sort-controls" method="GET" action="{{ url_for('my_appointments') }}">
+            <label for="appointment-sort">Sort by
+                <select id="appointment-sort" name="sort">
+                    <option value="date" {% if sort_by == 'date' %}selected{% endif %}>Appointment date (newest first)</option>
+                    <option value="date_oldest" {% if sort_by == 'date_oldest' %}selected{% endif %}>Appointment date (oldest first)</option>
+                    <option value="doctor" {% if sort_by == 'doctor' %}selected{% endif %}>Doctor name (A-Z)</option>
+                </select>
+            </label>
+            <button type="submit">Apply</button>
+        </form>
+
+        {% for appointment in appointments %}
 
 
         <!-- Calendar -->
 
         <div class="calendar-box">
-
             <div id="appointment-calendar"></div>
+        </div>
+
+        <span class="status-badge status-{{ appointment['status'] | lower }}">
+            {{ appointment["status"] }}
+        </span>
+
+        <p>
+            <strong>Doctor:</strong>
+            {{ appointment["doctor_name"] }}
+        </p>
+
+        <p>
+            <strong>Date:</strong>
+            {{ appointment["appointment_date"] }}
+        </p>
+
+        <p>
+            <strong>Time:</strong>
+            {{ appointment["appointment_time"] }}
+        </p>
+
+        <p>
+            <strong>Reason:</strong>
+            {{ appointment["reason"] or "Not provided" }}
+        </p>
+
+            <div class="appointment-actions">
+                <a class="prep-link"
+                   href="{{ url_for('appointment_visit_prep', appointment_id=appointment['id']) }}">
+                    {% if appointment['has_prep'] %}Open doctor visit preparation notes{% else %}Create doctor visit preparation notes{% endif %}
+                </a>
+                <form method="POST"
+                      action="{{ url_for('delete_appointment', appointment_id=appointment['id']) }}">
+                    <button class="delete-button" type="button" data-delete-trigger>Delete appointment</button>
+                </form>
+            </div>
 
         </div>
 
@@ -543,6 +907,9 @@
 
         {% else %}
 
+        <div class="appointment-card">
+            <p>No appointments found.</p>
+        </div>
 
             <div class="no-appointments">
 
@@ -562,8 +929,15 @@
             href="{{ url_for('book_appointment') }}"
         >
 
+        <a class="prep-link"
+           href="{{ url_for('book_appointment') }}">
             + Book Another Appointment
+        </a>
 
+        <a class="log-link"
+           href="{{ url_for('log_appointment') }}">
+            + Log Appointment
+        </a>
         </a>
 
 
@@ -571,293 +945,133 @@
 
 </main>
 
-
+<dialog class="delete-confirmation" id="delete-confirmation"
+        aria-labelledby="delete-confirmation-title"
+        aria-describedby="delete-confirmation-message">
+    <h2 id="delete-confirmation-title">Delete this appointment?</h2>
+    <p id="delete-confirmation-message">This removes the logged appointment from your list.</p>
+    <div class="confirmation-actions">
+        <button class="keep-appointment" type="button" data-cancel-delete>Keep appointment</button>
+        <button class="confirm-delete" type="button" data-confirm-delete>Delete appointment</button>
+    </div>
+</dialog>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        function () {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
+        const events = [
+            {% for appointment in appointments %}
+            {
+                title: "{{ appointment['appointment_type'] | e }}",
+                start: "{{ appointment['appointment_date'] }}",
+                extendedProps: {
+                    time: "{{ appointment['appointment_time'] | e }}",
+                    reason: "{{ appointment['reason'] | e }}",
+                    doctor: "{{ appointment['doctor_name'] | e }}"
+                }
+            }
+            {% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
 
-            /*
-            =====================================
-            TODAY
-            =====================================
-            */
+        events.forEach(function (event) {
+            const eventDate = new Date(event.start + "T00:00:00");
 
-            const today = new Date();
+            if (eventDate < today) {
+                event.backgroundColor = "#aaaaaa";
+                event.borderColor = "#aaaaaa";
+                event.textColor = "#ffffff";
+                event.extendedProps.status = "History Appointment";
+            } else {
+                event.backgroundColor = "#8059c8";
+                event.borderColor = "#8059c8";
+                event.textColor = "#ffffff";
+                event.extendedProps.status = "Future Appointment";
+            }
+        });
 
-            today.setHours(
-                0,
-                0,
-                0,
-                0
-            );
+        const calendarElement = document.getElementById("appointment-calendar");
 
+        const calendar = new FullCalendar.Calendar(calendarElement, {
+            initialView: "dayGridMonth",
+            height: "auto",
+            headerToolbar: {
+                left: "prev,next today",
+                center: "title",
+                right: ""
+            },
+            events: events,
+            eventClick: function (info) {
+                const event = info.event;
+                let message = event.title + "\n\nDate: " + event.startStr;
 
-            /*
-            =====================================
-            CALENDAR EVENTS
-            =====================================
-            */
-
-            const events = [
-
-                {% for appointment in appointments %}
-
-                {
-
-                    title:
-                        "{{ appointment['appointment_type'] | e }}",
-
-                    start:
-                        "{{ appointment['appointment_date'] }}",
-
-                    extendedProps: {
-
-                        time:
-                            "{{ appointment['appointment_time'] | e }}",
-
-                        reason:
-                            "{{ appointment['reason'] | e }}"
-
-                    }
-
+                if (event.extendedProps.doctor) {
+                    message += "\nDoctor: " + event.extendedProps.doctor;
+                }
+                if (event.extendedProps.time) {
+                    message += "\nTime: " + event.extendedProps.time;
+                }
+                if (event.extendedProps.reason) {
+                    message += "\nReason: " + event.extendedProps.reason;
                 }
 
-                {% if not loop.last %}
-                    ,
-                {% endif %}
-
-                {% endfor %}
-
-            ];
-
-
-
-            /*
-            =====================================
-            DETERMINE HISTORY / FUTURE
-            =====================================
-            */
-
-            events.forEach(
-                function (event) {
-
-
-                    const eventDate =
-                        new Date(
-                            event.start + "T00:00:00"
-                        );
-
-
-                    if (eventDate < today) {
-
-                        event.backgroundColor =
-                            "#aaaaaa";
-
-                        event.borderColor =
-                            "#aaaaaa";
-
-                        event.textColor =
-                            "#ffffff";
-
-                        event.extendedProps.status =
-                            "History Appointment";
-
-                    }
-
-                    else {
-
-                        event.backgroundColor =
-                            "#8059c8";
-
-                        event.borderColor =
-                            "#8059c8";
-
-                        event.textColor =
-                            "#ffffff";
-
-                        event.extendedProps.status =
-                            "Future Appointment";
-
-                    }
-
-                }
-            );
-
-
-
-            /*
-            =====================================
-            CREATE CALENDAR
-            =====================================
-            */
-
-            const calendarElement =
-                document.getElementById(
-                    "appointment-calendar"
-                );
-
-
-            const calendar =
-                new FullCalendar.Calendar(
-                    calendarElement,
-                    {
-
-                        initialView:
-                            "dayGridMonth",
-
-                        height:
-                            "auto",
-
-                        headerToolbar: {
-
-                            left:
-                                "prev,next today",
-
-                            center:
-                                "title",
-
-                            right:
-                                ""
-
-                        },
-
-                        events:
-                            events,
-
-                        eventClick:
-                            function (info) {
-
-
-                                const event =
-                                    info.event;
-
-
-                                let message =
-
-                                    event.title +
-
-                                    "\\n\\nDate: " +
-
-                                    event.startStr;
-
-
-                                if (
-                                    event.extendedProps.time
-                                ) {
-
-                                    message +=
-
-                                        "\\nTime: " +
-
-                                        event.extendedProps.time;
-
-                                }
-
-
-                                if (
-                                    event.extendedProps.reason
-                                ) {
-
-                                    message +=
-
-                                        "\\nReason: " +
-
-                                        event.extendedProps.reason;
-
-                                }
-
-
-                                message +=
-
-                                    "\\nStatus: " +
-
-                                    event.extendedProps.status;
-
-
-                                alert(message);
-
-                            }
-
-                    }
-                );
-
-
-            calendar.render();
-
-
-
-            /*
-            =====================================
-            UPDATE APPOINTMENT LIST STATUS
-            =====================================
-            */
-
-            document
-                .querySelectorAll(
-                    ".appointment-item"
-                )
-                .forEach(
-                    function (item) {
-
-
-                        const dateString =
-                            item.dataset.date;
-
-
-                        const appointmentDate =
-                            new Date(
-                                dateString +
-                                "T00:00:00"
-                            );
-
-
-                        const statusElement =
-                            item.querySelector(
-                                ".appointment-status"
-                            );
-
-
-                        if (
-                            appointmentDate < today
-                        ) {
-
-
-                            statusElement.textContent =
-                                "History Appointment";
-
-
-                            statusElement.classList.add(
-                                "status-history"
-                            );
-
-                        }
-
-
-                        else {
-
-
-                            statusElement.textContent =
-                                "Future Appointment";
-
-
-                            statusElement.classList.add(
-                                "status-future"
-                            );
-
-                        }
-
-
-                    }
-                );
-
-        }
-    );
-
+                message += "\nStatus: " + event.extendedProps.status;
+
+                alert(message);
+            }
+        });
+
+        calendar.render();
+
+        document.querySelectorAll(".appointment-item").forEach(function (item) {
+            const dateString = item.dataset.date;
+            const appointmentDate = new Date(dateString + "T00:00:00");
+            const statusElement = item.querySelector(".appointment-status");
+
+            if (appointmentDate < today) {
+                statusElement.textContent = "History Appointment";
+                statusElement.classList.add("status-history");
+            } else {
+                statusElement.textContent = "Future Appointment";
+                statusElement.classList.add("status-future");
+            }
+        });
+
+        const deleteConfirmation = document.querySelector('#delete-confirmation');
+        const appointmentsContainer = document.querySelector('.appointments-container');
+        let pendingDeleteForm = null;
+
+        appointmentsContainer.addEventListener('click', (event) => {
+            const trigger = event.target.closest('[data-delete-trigger]');
+            if (!trigger) return;
+
+            pendingDeleteForm = trigger.closest('form');
+            deleteConfirmation.showModal();
+        });
+
+        document.querySelector('[data-cancel-delete]').addEventListener('click', () => {
+            deleteConfirmation.close();
+            pendingDeleteForm = null;
+        });
+
+        document.querySelector('[data-confirm-delete]').addEventListener('click', () => {
+            if (pendingDeleteForm) pendingDeleteForm.requestSubmit();
+        });
+
+        deleteConfirmation.addEventListener('click', (event) => {
+            if (event.target === deleteConfirmation) {
+                deleteConfirmation.close();
+                pendingDeleteForm = null;
+            }
+        });
+
+        deleteConfirmation.addEventListener('close', () => {
+            pendingDeleteForm = null;
+        });
+
+    });
 </script>
-
-
 {% endblock %}
