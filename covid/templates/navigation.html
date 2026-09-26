@@ -1,31 +1,82 @@
+
 <nav id="nav">
-  <img id="logo" src="{{ url_for('static', filename='covid-19.png') }}" />
 
-  <h2 id="nav-header">
-    {% if 'user_name' in session %} Hello, {{ session['user_name'] }} {%
-    endif %}
-  </h2>
-  <a class="btn-nav" href="{{ url_for('home_bp.home') }}">Home</a>
-  <a class="btn-nav" href="{{ url_for('authentication_bp.register') }}">Register</a>
-  <a class="btn-nav" href="{{ url_for('authentication_bp.login') }}">Login</a>
-  <a class="btn-nav" href="{{ url_for('authentication_bp.logout') }}">Logout</a>
+    <!-- Health Companion Logo -->
+    <div style="text-align:center; padding:30px 10px;">
+        <div style="font-size:45px;">💜</div>
+        <h2 style="color:white; font-size:20px;">
+            Health Companion
+        </h2>
+        <p style="color:#e5d8ff; font-size:12px;">
+            Your Health, Our Priority
+        </p>
+    </div>
 
-  <div>
-    <h3>
-      <a class="btn-nav" href="{{ url_for('news_bp.articles_by_date') }}">
-        Browse timeline
-      </a>
-    </h3>
-  </div>
+    <!-- Main Navigation -->
+    <a class="btn-nav"
+       href="{{ url_for('home_bp.home') }}">
+        Home
+    </a>
 
-  <div>
-    <h3 id="sub-nav-header">Browse by tag</h3>
-    {% for key in tag_urls %}
-      <a class="btn-nav" href="{{ tag_urls[key] }}">{{ key }}</a>
-    {% endfor %}
-  </div>
+    <a class="btn-nav"
+       href="{{ url_for('book_appointment') }}">
+        Book Appointment
+    </a>
 
-  <div id="nav-footer">
-    COMPSCI 235 Software Development Methodologies
-  </div>
+<a class="btn-nav"
+   href="{{ url_for('my_appointments') }}">
+    My Appointments
+</a>
+
+    <!-- Future Features -->
+    <div style="padding:20px 10px 8px; color:#e5d8ff;">
+        HEALTH SERVICES
+    </div>
+
+    <span class="btn-nav"
+          style="display:block; opacity:0.6;">
+        Doctor Visit Prep (Coming Soon)
+    </span>
+
+    <span class="btn-nav"
+          style="display:block; opacity:0.6;">
+        Health Timeline (Coming Soon)
+    </span>
+
+    <span class="btn-nav"
+          style="display:block; opacity:0.6;">
+        Medication Tracker (Coming Soon)
+    </span>
+
+    <!-- Account -->
+    <div style="padding:20px 10px 8px; color:#e5d8ff;">
+        ACCOUNT
+    </div>
+
+    {% if 'user_name' in session %}
+        <p style="color:white; padding:0 10px;">
+            Hello, {{ session['user_name'] }}
+        </p>
+
+        <a class="btn-nav"
+           href="{{ url_for('authentication_bp.logout') }}">
+            Logout
+        </a>
+    {% else %}
+        <a class="btn-nav"
+           href="{{ url_for('authentication_bp.login') }}">
+            Login
+        </a>
+
+        <a class="btn-nav"
+           href="{{ url_for('authentication_bp.register') }}">
+            Register
+        </a>
+    {% endif %}
+
+    <div id="nav-footer">
+        Health Companion © 2026
+    </div>
+
 </nav>
+

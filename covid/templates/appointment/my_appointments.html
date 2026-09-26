@@ -1,0 +1,128 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<style>
+    .appointments-page {
+        min-height: 85vh;
+        padding: 50px 24px;
+        background: #f5f0ff;
+        font-family: Arial, sans-serif;
+        box-sizing: border-box;
+    }
+
+    .appointments-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .appointments-container h1 {
+        color: #7952b3;
+        text-align: center;
+    }
+
+    .appointment-card {
+        margin: 20px 0;
+        padding: 25px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(104, 73, 155, 0.1);
+    }
+
+    .appointment-card h2 {
+        color: #64439b;
+    }
+
+    .appointment-card p {
+        margin: 12px 0;
+        color: #40364f;
+    }
+
+    .pending {
+        display: inline-block;
+        padding: 7px 13px;
+        border-radius: 20px;
+        background: #fff0c2;
+        color: #856300;
+        font-weight: bold;
+    }
+
+    .book-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 13px 22px;
+        border-radius: 10px;
+        background: #8059c8;
+        color: white;
+        text-decoration: none;
+    }
+
+    #container:has(.appointments-page) {
+        display: block;
+        width: 100%;
+    }
+</style>
+
+<main class="appointments-page">
+
+    <div class="appointments-container">
+
+        <h1>My Appointments</h1>
+
+        <p style="text-align:center;">
+            Your saved appointment requests
+        </p>
+
+        {% for appointment in appointments %}
+
+        <div class="appointment-card">
+
+            <h2>
+                {{ appointment["appointment_type"] }}
+            </h2>
+
+            <span class="pending">
+                {{ appointment["status"] }}
+            </span>
+
+            <p>
+                <strong>Patient:</strong>
+                {{ appointment["patient_name"] }}
+            </p>
+
+            <p>
+                <strong>Date:</strong>
+                {{ appointment["appointment_date"] }}
+            </p>
+
+            <p>
+                <strong>Time:</strong>
+                {{ appointment["appointment_time"] }}
+            </p>
+
+            <p>
+                <strong>Reason:</strong>
+                {{ appointment["reason"] or "Not provided" }}
+            </p>
+
+        </div>
+
+        {% else %}
+
+        <div class="appointment-card">
+            <p>No appointment requests found.</p>
+        </div>
+
+        {% endfor %}
+
+        <a class="book-link"
+           href="{{ url_for('book_appointment') }}">
+            + Book Another Appointment
+        </a>
+
+    </div>
+
+</main>
+
+{% endblock %}
