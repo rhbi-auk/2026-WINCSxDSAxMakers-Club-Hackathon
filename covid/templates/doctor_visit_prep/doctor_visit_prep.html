@@ -165,14 +165,30 @@
             </small>
         </div>
         {% endif %}
+        {% if error %}
+        <div style="
+            background: #fff0f1;
+            color: #a13333;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        ">
+            {{ error }}
+        </div>
+        {% endif %}
 
         <h1>Doctor Visit Prep</h1>
 
+        {% if appointment %}
         <p>
-            Prepare for your next doctor visit.
+            Preparation notes for {{ appointment["doctor_name"] }}'s {{ appointment["appointment_type"] }} on {{ appointment["appointment_date"] }}.
         </p>
+        {% else %}
+        <p>Prepare for your next doctor visit.</p>
+        {% endif %}
 
-        <form method="POST">
+        <form method="POST"{% if appointment %} action="{{ url_for('appointment_visit_prep', appointment_id=appointment['id']) }}"{% endif %}>
 
             <!-- Main concern / Symptoms -->
             <label for="main_concern">
@@ -185,7 +201,7 @@
                 rows="4"
                 placeholder="What symptoms or discomfort are you experiencing?"
                 required
-            ></textarea>
+            >{{ prep_notes.main_concern if prep_notes else '' }}</textarea>
 
             <!-- When did it start -->
             <label for="start_date">
@@ -198,6 +214,7 @@
                 name="start_date"
                 placeholder="MM/DD/YYYY"
                 autocomplete="off"
+                value="{{ prep_notes.start_date if prep_notes else '' }}"
                 required
             >
 
@@ -211,7 +228,7 @@
                 name="duration_frequency"
                 rows="4"
                 placeholder="How long have you had these symptoms, and how often do they occur?"
-            ></textarea>
+            >{{ prep_notes.duration_frequency if prep_notes else '' }}</textarea>
 
             <!-- Current medications -->
             <label for="current_medications">
@@ -223,7 +240,7 @@
                 name="current_medications"
                 rows="4"
                 placeholder="What medications are you currently taking?"
-            ></textarea>
+            >{{ prep_notes.current_medications if prep_notes else '' }}</textarea>
 
             <!-- Allergies -->
             <label for="allergies">
@@ -235,7 +252,7 @@
                 name="allergies"
                 rows="4"
                 placeholder="Do you have any known allergies?"
-            ></textarea>
+            >{{ prep_notes.allergies if prep_notes else '' }}</textarea>
 
             <!-- Questions for your doctor -->
             <label for="questions">
@@ -247,7 +264,7 @@
                 name="questions"
                 rows="4"
                 placeholder="What would you like to ask your doctor?"
-            ></textarea>
+            >{{ prep_notes.questions if prep_notes else '' }}</textarea>
 
             <!-- Submit -->
             <button type="submit">

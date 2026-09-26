@@ -78,8 +78,17 @@
         background: #6944b0;
     }
 
+    .appointment-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .prep-link,
     .delete-button {
-        margin-top: 8px;
+        display: inline-block;
         padding: 10px 16px;
         border: 1px solid #8059c8;
         border-radius: 8px;
@@ -87,6 +96,12 @@
         background: white;
         font: inherit;
         cursor: pointer;
+        text-decoration: none;
+    }
+
+    .prep-link:hover {
+        color: white;
+        background: #8059c8;
     }
 
     .delete-button:hover {
@@ -248,10 +263,16 @@
                 {{ appointment["reason"] or "Not provided" }}
             </p>
 
-            <form method="POST"
-                  action="{{ url_for('delete_appointment', appointment_id=appointment['id']) }}">
-                <button class="delete-button" type="button" data-delete-trigger>Delete appointment</button>
-            </form>
+            <div class="appointment-actions">
+                <a class="prep-link"
+                   href="{{ url_for('appointment_visit_prep', appointment_id=appointment['id']) }}">
+                    {% if appointment['has_prep'] %}Open doctor visit preparation notes{% else %}Create doctor visit preparation notes{% endif %}
+                </a>
+                <form method="POST"
+                      action="{{ url_for('delete_appointment', appointment_id=appointment['id']) }}">
+                    <button class="delete-button" type="button" data-delete-trigger>Delete appointment</button>
+                </form>
+            </div>
 
         </div>
 

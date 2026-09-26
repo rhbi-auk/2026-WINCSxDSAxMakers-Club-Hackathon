@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import date, time
 import sqlite3
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, abort
 
 import covid.adapters.repository as repo
 from covid.adapters.memory_repository import MemoryRepository, populate
@@ -92,6 +92,19 @@ def create_app(test_config=None):
                 conn.execute(
                     "ALTER TABLE appointments RENAME COLUMN patient_name TO doctor_name"
                 )
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS appointment_preparation (
+                    appointment_id INTEGER PRIMARY KEY,
+                    main_concern TEXT NOT NULL,
+                    start_date TEXT NOT NULL,
+                    duration_frequency TEXT NOT NULL DEFAULT '',
+                    current_medications TEXT NOT NULL DEFAULT '',
+                    allergies TEXT NOT NULL DEFAULT '',
+                    questions TEXT NOT NULL DEFAULT '',
+                    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
+                )
+            """)
 
         # --------------------------------
         # Log appointment
@@ -227,7 +240,12 @@ def create_app(test_config=None):
                 conn.row_factory = sqlite3.Row
 
                 appointments = conn.execute(f"""
-                    SELECT *
+                    SELECT appointments.*,
+                           EXISTS (
+                               SELECT 1
+                               FROM appointment_preparation
+                               WHERE appointment_preparation.appointment_id = appointments.id
+                           ) AS has_prep
                     FROM appointments
                     ORDER BY {sort_orders[sort_by]}
                 """).fetchall()
@@ -248,12 +266,97 @@ def create_app(test_config=None):
 
         # Delete appointment
         @app.route(
+            "/appointment/<int:appointment_id>/prep",
+            methods=["GET", "POST"]
+        )
+        def appointment_visit_prep(appointment_id):
+            field_names = (
+                "main_concern",
+                "start_date",
+                "duration_frequency",
+                "current_medications",
+                "allergies",
+                "questions"
+            )
+            success = False
+
+            with sqlite3.connect(db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                appointment = conn.execute(
+                    "SELECT * FROM appointments WHERE id = ?",
+                    (appointment_id,)
+                ).fetchone()
+                if appointment is None:
+                    abort(404)
+
+                existing_notes = conn.execute(
+                    "SELECT * FROM appointment_preparation WHERE appointment_id = ?",
+                    (appointment_id,)
+                ).fetchone()
+                prep_notes = {
+                    field: existing_notes[field] if existing_notes else ""
+                    for field in field_names
+                }
+
+                if request.method == "POST":
+                    prep_notes = {
+                        field: request.form.get(field, "").strip()
+                        for field in field_names
+                    }
+                    if not prep_notes["main_concern"] or not prep_notes["start_date"]:
+                        return render_template(
+                            "doctor_visit_prep/doctor_visit_prep.html",
+                            appointment=appointment,
+                            prep_notes=prep_notes,
+                            error="Please complete the main concern and start date."
+                        ), 400
+
+                    conn.execute("""
+                        INSERT INTO appointment_preparation (
+                            appointment_id,
+                            main_concern,
+                            start_date,
+                            duration_frequency,
+                            current_medications,
+                            allergies,
+                            questions
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        ON CONFLICT(appointment_id) DO UPDATE SET
+                            main_concern = excluded.main_concern,
+                            start_date = excluded.start_date,
+                            duration_frequency = excluded.duration_frequency,
+                            current_medications = excluded.current_medications,
+                            allergies = excluded.allergies,
+                            questions = excluded.questions
+                    """, (
+                        appointment_id,
+                        prep_notes["main_concern"],
+                        prep_notes["start_date"],
+                        prep_notes["duration_frequency"],
+                        prep_notes["current_medications"],
+                        prep_notes["allergies"],
+                        prep_notes["questions"]
+                    ))
+                    success = True
+
+            return render_template(
+                "doctor_visit_prep/doctor_visit_prep.html",
+                appointment=appointment,
+                prep_notes=prep_notes,
+                success=success
+            )
+
+        @app.route(
             "/appointment/<int:appointment_id>/delete",
             methods=["POST"]
         )
         def delete_appointment(appointment_id):
 
             with sqlite3.connect(db_path) as conn:
+                conn.execute(
+                    "DELETE FROM appointment_preparation WHERE appointment_id = ?",
+                    (appointment_id,)
+                )
                 conn.execute(
                     "DELETE FROM appointments WHERE id = ?",
                     (appointment_id,)
