@@ -1,0 +1,249 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<style>
+    .appointment-page {
+        min-height: 85vh;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #f8f5ff, #e9e0ff);
+        font-family: Arial, sans-serif;
+    }
+
+    .appointment-card {
+        max-width: 650px;
+        margin: 0 auto;
+        padding: 40px;
+        background: white;
+        border-radius: 22px;
+        box-shadow: 0 12px 40px rgba(104, 73, 155, 0.13);
+    }
+
+    .appointment-card h1 {
+        text-align: center;
+        color: #64439b;
+        margin-bottom: 10px;
+    }
+
+    .appointment-subtitle {
+        text-align: center;
+        color: #81778e;
+        margin-bottom: 30px;
+    }
+
+    .form-field {
+        margin-bottom: 20px;
+    }
+
+    .form-field label {
+        display: block;
+        margin-bottom: 8px;
+        color: #40364f;
+        font-weight: 600;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 13px;
+        border: 1px solid #ddd4ef;
+        border-radius: 10px;
+        background: #fcfbff;
+        font-size: 15px;
+    }
+
+    .book-button {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 11px;
+        background: #8059c8;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .success-box {
+        padding: 22px;
+        background: #eefbf3;
+        border: 1px solid #b8e8ca;
+        border-radius: 12px;
+        color: #27663e;
+    }
+    #sidebar {
+        display: none;
+    }
+
+    #main {
+        width: 100%;
+    }
+</style>
+
+
+<main id="main" class="appointment-page">
+
+    <div class="appointment-card">
+
+        {% if success %}
+
+            <div class="success-box">
+
+                <h2>✓ Appointment Confirmed</h2>
+
+                <p>Your appointment has been successfully booked.</p>
+
+                <p>
+                    <strong>Patient:</strong>
+                    {{ appointment.user_name }}
+                </p>
+
+                <p>
+                    <strong>Appointment Type:</strong>
+                    {{ appointment.appointment_type }}
+                </p>
+
+                <p>
+                    <strong>Doctor:</strong>
+                    {{ appointment.doctor }}
+                </p>
+
+                <p>
+                    <strong>Date:</strong>
+                    {{ appointment.date }}
+                </p>
+
+                <p>
+                    <strong>Time:</strong>
+                    {{ appointment.time }}
+                </p>
+
+                <p>
+                    <strong>Reason:</strong>
+                    {{ appointment.reason }}
+                </p>
+
+            </div>
+
+        {% else %}
+
+            <h1>Book an Appointment</h1>
+
+            <p class="appointment-subtitle">
+                Choose your preferred appointment details below.
+            </p>
+
+            <form method="POST">
+
+                <div class="form-field">
+                    <label for="appointment_type">Appointment Type</label>
+
+                    <select id="appointment_type"
+                            name="appointment_type"
+                            required>
+
+                        <option value="">Select appointment type</option>
+
+                        <option value="General Consultation">
+                            General Consultation
+                        </option>
+
+                        <option value="Follow-up">
+                            Follow-up
+                        </option>
+
+                        <option value="Mental Health">
+                            Mental Health
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+                </div>
+
+
+                <div class="form-field">
+                    <label for="doctor">Preferred Doctor</label>
+
+                    <select id="doctor"
+                            name="doctor"
+                            required>
+
+                        <option value="">Select a doctor</option>
+
+                        <option value="Dr Sarah Lee">
+                            Dr Sarah Lee
+                        </option>
+
+                        <option value="Dr James Chen">
+                            Dr James Chen
+                        </option>
+
+                        <option value="Dr Emily Wilson">
+                            Dr Emily Wilson
+                        </option>
+
+                    </select>
+                </div>
+
+
+                <div class="form-field">
+                    <label for="date">Preferred Date</label>
+
+                    <input type="date"
+                           id="date"
+                           name="date"
+                           required>
+                </div>
+
+
+                <div class="form-field">
+                    <label for="time">Preferred Time</label>
+
+                    <select id="time" name="time" required>
+                        <option value="">Select a time</option>
+                        <option value="09:00">9:00 AM</option>
+                        <option value="09:30">9:30 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="10:30">10:30 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="11:30">11:30 AM</option>
+                        <option value="13:00">1:00 PM</option>
+                        <option value="13:30">1:30 PM</option>
+                        <option value="14:00">2:00 PM</option>
+                        <option value="14:30">2:30 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="15:30">3:30 PM</option>
+                        <option value="16:00">4:00 PM</option>
+                    </select>
+                </div>
+
+
+                <div class="form-field">
+                    <label for="reason">Reason for Appointment</label>
+
+                    <textarea id="reason"
+                              name="reason"
+                              rows="5"
+                              placeholder="Briefly describe the reason for your appointment"
+                              required></textarea>
+                </div>
+
+
+                <button type="submit" class="book-button">
+                    Book Appointment
+                </button>
+
+            </form>
+
+        {% endif %}
+
+    </div>
+
+</main>
+
+{% endblock %}
